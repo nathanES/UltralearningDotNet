@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Tasks.Api.Mapping;
 using TaskManagement.Tasks.Contracts.Requests;
 using TaskManagement.Tasks.Contracts.Responses;
+using TaskManagement.Tasks.Interfaces;
 using TaskManagement.Tasks.Services;
 
 namespace TaskManagement.Tasks.Api.Endpoints;

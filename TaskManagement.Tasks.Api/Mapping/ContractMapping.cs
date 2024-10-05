@@ -1,4 +1,5 @@
 using TaskManagement.Common.Models;
+using TaskManagement.Tasks.Commands.CreateTask;
 using TaskManagement.Tasks.Contracts.Requests;
 using TaskManagement.Tasks.Contracts.Responses;
 using TaskManagement.Tasks.Models;
@@ -8,14 +9,14 @@ namespace TaskManagement.Tasks.Api.Mapping;
 
 public static class ContractMapping
 {
-    public static Task MapToTask(this CreateTaskRequest request)
+    public static CreateTaskCommand MapToCommand(this CreateTaskRequest request)
     {
-        Guid id = Guid.NewGuid();
-        return new Task(id,request.Title,
+        return new CreateTaskCommand(Guid.NewGuid(),
+            request.Title,
             request.Description,
             request.DeadLine,
             request.Priority.MapToPriorityModels(),
-            request.Status.MapToStatusModels());
+            request.Status.MapToStatusModels()); 
     }
     public static Task MapToTask(this UpdateTaskRequest request, Guid id)
     {

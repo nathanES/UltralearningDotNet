@@ -1,7 +1,7 @@
 using TaskManagement.Tasks.Models;
 using Task = TaskManagement.Common.Models.Task;
 
-namespace TaskManagement.Tasks.Services;
+namespace TaskManagement.Tasks.Interfaces;
 
 public interface ITaskService
 {

@@ -1,7 +1,7 @@
 using System.Reflection.Metadata;
 using Microsoft.Extensions.Logging;
+using TaskManagement.Tasks.Interfaces;
 using TaskManagement.Tasks.Models;
-using TaskManagement.Tasks.Repositories;
 using Task = TaskManagement.Common.Models.Task;
 
 namespace TaskManagement.Tasks.Infrastructure.Repositories;

@@ -1,11 +1,14 @@
 using Asp.Versioning;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using TaskManagement.Common;
+using TaskManagement.Common.Mediator;
 using TaskManagement.Tasks;
 using TaskManagement.Tasks.Api;
 using TaskManagement.Tasks.Api.Endpoints;
 using TaskManagement.Tasks.Api.Middleware;
 using TaskManagement.Tasks.Api.Swagger;
+using TaskManagement.Tasks.Commands.CreateTask;
 using TaskManagement.Tasks.Database;
 using TaskManagement.Tasks.Infrastructure;
 
@@ -35,6 +38,7 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwa
 builder.Services.AddSwaggerGen(x => x.OperationFilter<SwaggerDefaultValues>());
 
 
+builder.Services.TryAddCommonServices();
 builder.Services.AddInfrastructure(config["Database:Task:ConnectionString"]!);
 builder.Services.AddTaskApplication();
 
