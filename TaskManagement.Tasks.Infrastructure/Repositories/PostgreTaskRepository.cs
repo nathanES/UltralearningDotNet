@@ -1,10 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TaskManagement.Tasks.Infrastructure.Data;
+using TaskManagement.Tasks.Infrastructure.Database;
 using TaskManagement.Tasks.Models;
 using TaskManagement.Tasks.Repositories;
-using TaskManagement.Tasks.Repositories;
-using Task = TaskManagement.Tasks.Models.Task;
+using Task = TaskManagement.Common.Models.Task;
 
 namespace TaskManagement.Tasks.Infrastructure.Repositories;
 
@@ -96,7 +95,7 @@ public class PostgreTaskRepository(ILogger<PostgreTaskRepository> logger, TasksC
         }
 
         context.Tasks.Remove(taskToDelete);
-        context.SaveChangesAsync(token);
+        await context.SaveChangesAsync(token);
         logger.LogDebug($"{nameof(DeleteByIdAsync)} - End");
         return true;
     }

@@ -4,7 +4,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using TaskManagement.Tasks;
 using TaskManagement.Tasks.Api;
 using TaskManagement.Tasks.Api.Endpoints;
-using TaskManagement.Tasks.Api.Middlewares;
+using TaskManagement.Tasks.Api.Middleware;
 using TaskManagement.Tasks.Api.Swagger;
 using TaskManagement.Tasks.Database;
 using TaskManagement.Tasks.Infrastructure;
@@ -36,7 +36,7 @@ builder.Services.AddSwaggerGen(x => x.OperationFilter<SwaggerDefaultValues>());
 
 
 builder.Services.AddInfrastructure(config["Database:Task:ConnectionString"]!);
-builder.Services.AddApplication();
+builder.Services.AddTaskApplication();
 
 
 

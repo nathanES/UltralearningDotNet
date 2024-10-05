@@ -2,16 +2,16 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using TaskManagement.Tasks.Models;
 using TaskManagement.Tasks.Repositories;
-using Task = TaskManagement.Tasks.Models.Task;
+using Task = TaskManagement.Common.Models.Task;
 
 namespace TaskManagement.Tasks.Services;
 
-public class TaskService(ITaskRepository taskRepository, IValidator<Task> taskValidator, ILogger<TaskService> logger)
+public class TaskService(ITaskRepository taskRepository, IValidator<Task> validator, ILogger<TaskService> logger)
     : ITaskService
 {
     public async Task<bool> CreateAsync(Task task, CancellationToken token = default)
     {
-        await taskValidator.ValidateAndThrowAsync(task, token);
+        await validator.ValidateAndThrowAsync(task, token);
         return await taskRepository.CreateAsync(task, token);
     }
 
@@ -27,7 +27,7 @@ public class TaskService(ITaskRepository taskRepository, IValidator<Task> taskVa
 
     public async Task<Task?> UpdateAsync(Task task, CancellationToken token = default)
     {
-        await taskValidator.ValidateAndThrowAsync(task, token);
+        await validator.ValidateAndThrowAsync(task, token);
 
         var isTaskExisting = await taskRepository.ExistsByIdAsync(task.Id, token);
         if (!isTaskExisting)

@@ -1,23 +1,25 @@
+using TaskManagement.Common.Models;
 using TaskManagement.Tasks.Contracts.Requests;
 using TaskManagement.Tasks.Contracts.Responses;
 using TaskManagement.Tasks.Models;
+using Task = TaskManagement.Common.Models.Task;
 
 namespace TaskManagement.Tasks.Api.Mapping;
 
 public static class ContractMapping
 {
-    public static Models.Task MapToTask(this CreateTaskRequest request)
+    public static Task MapToTask(this CreateTaskRequest request)
     {
         Guid id = Guid.NewGuid();
-        return new Models.Task(id,request.Title,
+        return new Task(id,request.Title,
             request.Description,
             request.DeadLine,
             request.Priority.MapToPriorityModels(),
             request.Status.MapToStatusModels());
     }
-    public static Models.Task MapToTask(this UpdateTaskRequest request, Guid id)
+    public static Task MapToTask(this UpdateTaskRequest request, Guid id)
     {
-        return new Models.Task(id,
+        return new Task(id,
             request.Title,
             request.Description,
             request.DeadLine,
@@ -34,14 +36,13 @@ public static class ContractMapping
             DeadLine = request.DeadLine,
             Priority =  request.Priority.MapToPriorityModels(),
             Status = request.Status.MapToStatusModels(),
-            SortOrder = null,//TODO
             Page = request.Page.GetValueOrDefault(PagedRequest.DefaultPage),
             PageSize = request.PageSize.GetValueOrDefault(PagedRequest.DefaultPageSize)
         };
     }
     
     
-    public static TaskResponse MapToResponse(this Models.Task task)
+    public static TaskResponse MapToResponse(this Task task)
     {
         return new TaskResponse
         {
@@ -53,7 +54,7 @@ public static class ContractMapping
             Status = task.Status.MapToStatusContract()
         };
     }
-    public static TasksResponse MapToResponse(this IEnumerable<Models.Task> tasks)
+    public static TasksResponse MapToResponse(this IEnumerable<Task> tasks)
     {
         return new TasksResponse
         {
@@ -61,44 +62,44 @@ public static class ContractMapping
         };
     }
 
-    private static Models.Priority? MapToPriorityModels(this Contracts.Priority? priority)
+    private static Priority? MapToPriorityModels(this Contracts.Priority? priority)
     {
         return priority switch
         {
-            Contracts.Priority.Low => Models.Priority.Low,
-            Contracts.Priority.Medium => Models.Priority.Medium,
-            Contracts.Priority.High => Models.Priority.High,
+            Contracts.Priority.Low => Priority.Low,
+            Contracts.Priority.Medium => Priority.Medium,
+            Contracts.Priority.High => Priority.High,
             _ => null
         };
     }
-    private static Models.Status? MapToStatusModels(this Contracts.Status? status)
+    private static Status? MapToStatusModels(this Contracts.Status? status)
     {
         return status switch
         {
-            Contracts.Status.Open => Models.Status.Open,
-            Contracts.Status.InProgress => Models.Status.InProgress,
-            Contracts.Status.Closed => Models.Status.Closed,
+            Contracts.Status.Open => Status.Open,
+            Contracts.Status.InProgress => Status.InProgress,
+            Contracts.Status.Closed => Status.Closed,
             _ => null
         };
     }
     
-    private static Contracts.Priority? MapToPriorityContract(this Models.Priority? priority)
+    private static Contracts.Priority? MapToPriorityContract(this Priority? priority)
     {
         return priority switch
         {
-            Models.Priority.Low => Contracts.Priority.Low,
-            Models.Priority.Medium => Contracts.Priority.Medium,
-            Models.Priority.High => Contracts.Priority.High,
+            Priority.Low => Contracts.Priority.Low,
+            Priority.Medium => Contracts.Priority.Medium,
+            Priority.High => Contracts.Priority.High,
             _ => null
         };
     }
-    private static Contracts.Status? MapToStatusContract(this Models.Status? status)
+    private static Contracts.Status? MapToStatusContract(this Status? status)
     {
         return status switch
         {
-            Models.Status.Open => Contracts.Status.Open,
-            Models.Status.InProgress =>  Contracts.Status.InProgress,
-            Models.Status.Closed => Contracts.Status.Closed,
+            Status.Open => Contracts.Status.Open,
+            Status.InProgress =>  Contracts.Status.InProgress,
+            Status.Closed => Contracts.Status.Closed,
             _ => null
         };
     }

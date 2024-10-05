@@ -2,7 +2,7 @@ using System.Reflection.Metadata;
 using Microsoft.Extensions.Logging;
 using TaskManagement.Tasks.Models;
 using TaskManagement.Tasks.Repositories;
-using Task = TaskManagement.Tasks.Models.Task;
+using Task = TaskManagement.Common.Models.Task;
 
 namespace TaskManagement.Tasks.Infrastructure.Repositories;
 
@@ -10,7 +10,7 @@ public class TaskRepository(ILogger<TaskRepository> logger) : ITaskRepository
 {
     private readonly List<Task> _tasks = [];
 
-    public Task<bool> CreateAsync(Task task, CancellationToken token = default)
+    public Task<bool> CreateAsync(@Task task, CancellationToken token = default)
     {
         if (ExistsById(task.Id))
             return System.Threading.Tasks.Task.FromResult(false);;
