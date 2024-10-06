@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Common.Mediator;
+using TaskManagement.Common.Models;
 using TaskManagement.Users.Api.Mapping;
+using TaskManagement.Users.Commands.UpdateUser;
 using TaskManagement.Users.Contracts.Requests;
 using TaskManagement.Users.Contracts.Responses;
+using TaskManagement.Users.Interfaces;
 using TaskManagement.Users.Services;
 
 namespace TaskManagement.Users.Api.Endpoints;
@@ -14,10 +18,10 @@ public static class UpdateUserEndpoint
     {
         app.MapPut(ApiEndpoints.Users.Update, async (Guid id,
                 [FromBody]UpdateUserRequest request, 
-                [FromServices] IUserService userService, CancellationToken token) =>
+                [FromServices] Mediator mediator, CancellationToken token) =>
             {
-                var user = request.MapToUser(id);
-                var updatedUser = await userService.UpdateAsync(user, token);
+                var command = request.MapToCommand(id);
+                var updatedUser = await mediator.SendAsync<UpdateUserCommand, User?>(command, token);
                 if (updatedUser is null)
                 {
                     return Results.NotFound();

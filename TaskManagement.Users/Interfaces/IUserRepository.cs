@@ -1,7 +1,7 @@
 using TaskManagement.Common.Models;
 using TaskManagement.Users.Models;
 
-namespace TaskManagement.Users.Repositories;
+namespace TaskManagement.Users.Interfaces;
 
 public interface IUserRepository
 {

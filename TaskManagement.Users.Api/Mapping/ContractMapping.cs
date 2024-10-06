@@ -1,4 +1,7 @@
 using TaskManagement.Common.Models;
+using TaskManagement.Users.Commands.CreateUser;
+using TaskManagement.Users.Commands.GetAllUsers;
+using TaskManagement.Users.Commands.UpdateUser;
 using TaskManagement.Users.Contracts.Requests;
 using TaskManagement.Users.Contracts.Responses;
 using TaskManagement.Users.Models;
@@ -8,28 +11,24 @@ namespace TaskManagement.Users.Api.Mapping;
 
 public static class ContractMapping
 {
-    public static User MapToUser(this CreateUserRequest request)
+    public static CreateUserCommand MapToCommand(this CreateUserRequest request)
     {
-        Guid id = Guid.NewGuid();
-        return new User(id, request.Username,
+        return new CreateUserCommand(Guid.NewGuid(), request.Username,
             request.Email);
     }
-    public static User MapToUser(this UpdateUserRequest request, Guid id)
+    public static UpdateUserCommand MapToCommand(this UpdateUserRequest request, Guid id)
     {
-        return new User(id,
+        return new UpdateUserCommand(id,
             request.Username,
             request.Email);
     }
 
-    public static GetAllUsersOptions MapToGetAllUsersOptions(this GetAllUsersRequest request)
+    public static GetAllUsersCommand MapToCommand(this GetAllUsersRequest request)
     {
-        return new GetAllUsersOptions
-        {
-            Username = request.Username,
-            Email = request.Email,
-            Page = request.Page.GetValueOrDefault(PagedRequest.DefaultPage),
-            PageSize = request.PageSize.GetValueOrDefault(PagedRequest.DefaultPageSize)
-        };
+        return new GetAllUsersCommand(request.Username,
+            request.Email,
+            request.Page.GetValueOrDefault(PagedRequest.DefaultPage),
+            request.PageSize.GetValueOrDefault(PagedRequest.DefaultPageSize)); 
     }
     
     

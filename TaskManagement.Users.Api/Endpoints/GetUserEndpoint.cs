@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Common.Mediator;
+using TaskManagement.Common.Models;
 using TaskManagement.Users.Api.Mapping;
+using TaskManagement.Users.Commands.GetUser;
 using TaskManagement.Users.Contracts.Responses;
+using TaskManagement.Users.Interfaces;
 using TaskManagement.Users.Services;
 
 namespace TaskManagement.Users.Api.Endpoints;
@@ -12,9 +16,10 @@ public static class GetUserEndpoint
     public static IEndpointRouteBuilder MapGetUser(this IEndpointRouteBuilder app)
     {
         app.MapGet(ApiEndpoints.Users.Get, async (Guid id,
-                [FromServices] IUserService userService, CancellationToken token) =>
+                [FromServices] Mediator mediator, CancellationToken token) =>
             {
-                var user = await userService.GetByIdAsync(id, token);
+                var command = new GetUserCommand(id);
+                var user = await mediator.SendAsync<GetUserCommand, User?>(command, token);
                 if (user is null)
                 {
                     return Results.NotFound();

@@ -1,9 +1,9 @@
 using TaskManagement.Common.Models;
 using TaskManagement.Users.Models;
 
-namespace TaskManagement.Users.Services;
+namespace TaskManagement.Users.Interfaces;
 
-public interface IUserService
+internal interface IUserService
 {
     Task<bool> CreateAsync(User user, CancellationToken token = default);
     Task<User?> GetByIdAsync(Guid id, CancellationToken token = default);

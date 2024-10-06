@@ -7,6 +7,7 @@ public class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior<TReque
 {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken token = default)
     {
+        //Here i can log the request in the Developpment environment, i need to get the environment
         logger.LogInformation("Handling {RequestName}", typeof(TRequest).Name);
         var response = await next();
         logger.LogInformation("Handled {RequestName}", typeof(TRequest).Name);

@@ -1,4 +1,4 @@
-namespace TaskManagement.Users.Database;
+namespace TaskManagement.Users.Interfaces;
 
 public interface IDbInitializer
 {

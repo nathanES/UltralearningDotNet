@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Common.Mediator;
+using TaskManagement.Users.Commands.DeleteUser;
+using TaskManagement.Users.Interfaces;
 using TaskManagement.Users.Services;
 
 namespace TaskManagement.Users.Api.Endpoints;
@@ -10,9 +13,10 @@ public static class DeleteUserEndpoint
     public static IEndpointRouteBuilder MapDeleteUser(this IEndpointRouteBuilder app)
     {
         app.MapDelete(ApiEndpoints.Users.Delete, async (Guid id,
-                [FromServices] IUserService userService, CancellationToken token) =>
+                [FromServices] Mediator mediator, CancellationToken token) =>
             {
-                var isDeleted = await userService.DeleteByIdAsync(id, token);
+                var command = new DeleteUserCommand(id);
+                var isDeleted = await mediator.SendAsync<DeleteUserCommand, bool>(command, token);
                 if (!isDeleted)
                 {
                     return Results.NotFound();

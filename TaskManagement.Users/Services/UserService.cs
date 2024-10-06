@@ -1,12 +1,12 @@
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using TaskManagement.Common.Models;
+using TaskManagement.Users.Interfaces;
 using TaskManagement.Users.Models;
-using TaskManagement.Users.Repositories;
 
 namespace TaskManagement.Users.Services;
 
-public class UserService(IUserRepository userRepository, IValidator<User> validator, ILogger<UserService> looger): IUserService
+public class UserService(IUserRepository userRepository, IValidator<User> validator, ILogger<UserService> loger): IUserService
 {
     public async Task<bool> CreateAsync(User user, CancellationToken token = default)
     {

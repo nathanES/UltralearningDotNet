@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TaskManagement.Tasks.Database;
+using TaskManagement.Tasks.Interfaces;
 
 namespace TaskManagement.Tasks.Infrastructure.Database;
 

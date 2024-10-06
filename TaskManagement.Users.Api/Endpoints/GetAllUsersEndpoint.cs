@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Common.Mediator;
+using TaskManagement.Common.Models;
 using TaskManagement.Users.Api.Mapping;
+using TaskManagement.Users.Commands.GetAllUsers;
 using TaskManagement.Users.Contracts.Requests;
 using TaskManagement.Users.Contracts.Responses;
+using TaskManagement.Users.Interfaces;
 using TaskManagement.Users.Services;
 
 namespace TaskManagement.Users.Api.Endpoints;
@@ -13,10 +17,10 @@ public static class GetAllUsersEndpoint
     public static IEndpointRouteBuilder MapGetAllUsers(this IEndpointRouteBuilder app)
     {
         app.MapGet(ApiEndpoints.Users.GetAll, async ([AsParameters] GetAllUsersRequest request, 
-                [FromServices] IUserService userService, CancellationToken token) =>
+                [FromServices] Mediator mediator, CancellationToken token) =>
             {
-                var options = request.MapToGetAllUsersOptions();
-                var users = await userService.GetAllAsync(options, token);
+                var command = request.MapToCommand();
+                var users = await mediator.SendAsync<GetAllUsersCommand, IEnumerable<User>>(command, token);
                 if (!users.Any())
                 {
                     return Results.NotFound();

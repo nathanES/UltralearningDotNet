@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using TaskManagement.Users.Database;
 using TaskManagement.Users.Infrastructure.Database;
 using TaskManagement.Users.Infrastructure.Repositories;
-using TaskManagement.Users.Repositories;
+using TaskManagement.Users.Interfaces;
 
 namespace TaskManagement.Users.Infrastructure;
 

@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TaskManagement.Common.Models;
 using TaskManagement.Users.Infrastructure.Database;
+using TaskManagement.Users.Interfaces;
 using TaskManagement.Users.Models;
-using TaskManagement.Users.Repositories;
 
 namespace TaskManagement.Users.Infrastructure.Repositories;
 

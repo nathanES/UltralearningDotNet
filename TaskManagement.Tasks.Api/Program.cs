@@ -9,8 +9,8 @@ using TaskManagement.Tasks.Api.Endpoints;
 using TaskManagement.Tasks.Api.Middleware;
 using TaskManagement.Tasks.Api.Swagger;
 using TaskManagement.Tasks.Commands.CreateTask;
-using TaskManagement.Tasks.Database;
 using TaskManagement.Tasks.Infrastructure;
+using TaskManagement.Tasks.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
