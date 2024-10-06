@@ -1,9 +1,10 @@
-
+using TaskManagement.Common.Mediator;
 using TaskManagement.Common.Models;
+using Task = TaskManagement.Common.Models.Task;
 
-namespace TaskManagement.Tasks.Models;
+namespace TaskManagement.Tasks.Commands.GetAllTasks;
 
-public class GetAllTasksOptions
+public class GetAllTasksCommand : IRequest<IEnumerable<Task>>
 {
     public string? Title { get; set; }
 
@@ -17,5 +18,5 @@ public class GetAllTasksOptions
 
     public int Page { get; set; }
 
-    public int PageSize { get; set; }
+    public int PageSize { get; set; } 
 }

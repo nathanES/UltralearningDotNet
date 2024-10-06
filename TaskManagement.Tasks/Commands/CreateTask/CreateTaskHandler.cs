@@ -4,9 +4,9 @@ using Task = TaskManagement.Common.Models.Task;
 
 namespace TaskManagement.Tasks.Commands.CreateTask;
 
-public class CreateTaskHandler(ITaskService taskService) : IRequestHandler<CreateTaskCommand, bool>
+internal class CreateTaskHandler(ITaskService taskService) : IRequestHandler<CreateTaskCommand, bool>
 {
-    public async Task<bool> Handle(CreateTaskCommand request, CancellationToken token = default)
+    public async Task<bool> HandleAsync(CreateTaskCommand request, CancellationToken token = default)
     {
         var task = new Task(
             Guid.NewGuid(),

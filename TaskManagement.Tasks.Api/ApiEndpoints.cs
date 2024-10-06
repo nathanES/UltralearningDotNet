@@ -1,5 +1,3 @@
-using TaskManagement.Tasks.Models;
-
 namespace TaskManagement.Tasks.Api;
 
 public static class ApiEndpoints

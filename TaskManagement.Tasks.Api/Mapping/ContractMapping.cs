@@ -1,8 +1,10 @@
 using TaskManagement.Common.Models;
 using TaskManagement.Tasks.Commands.CreateTask;
+using TaskManagement.Tasks.Commands.DeleteTask;
+using TaskManagement.Tasks.Commands.GetAllTasks;
+using TaskManagement.Tasks.Commands.UpdateTask;
 using TaskManagement.Tasks.Contracts.Requests;
 using TaskManagement.Tasks.Contracts.Responses;
-using TaskManagement.Tasks.Models;
 using Task = TaskManagement.Common.Models.Task;
 
 namespace TaskManagement.Tasks.Api.Mapping;
@@ -18,30 +20,32 @@ public static class ContractMapping
             request.Priority.MapToPriorityModels(),
             request.Status.MapToStatusModels()); 
     }
-    public static Task MapToTask(this UpdateTaskRequest request, Guid id)
+    public static GetAllTasksCommand MapToCommand(this GetAllTasksRequest request)
     {
-        return new Task(id,
-            request.Title,
-            request.Description,
-            request.DeadLine,
-            request.Priority.MapToPriorityModels(),
-            request.Status.MapToStatusModels());
-    }
-
-    public static Models.GetAllTasksOptions MapToGetAllTasksOptions(this GetAllTasksRequest request)
-    {
-        return new GetAllTasksOptions
+        return new GetAllTasksCommand
         {
             Title = request.Title,
-            Description = request.Title,
+            Description = request.Description,
             DeadLine = request.DeadLine,
-            Priority =  request.Priority.MapToPriorityModels(),
+            Priority = request.Priority.MapToPriorityModels(),
             Status = request.Status.MapToStatusModels(),
             Page = request.Page.GetValueOrDefault(PagedRequest.DefaultPage),
             PageSize = request.PageSize.GetValueOrDefault(PagedRequest.DefaultPageSize)
         };
     }
-    
+
+    public static UpdateTaskCommand MapToCommand(this UpdateTaskRequest request, Guid id)
+    {
+        return new UpdateTaskCommand
+        {
+            Id = id,
+            Title = request.Title,
+            Description = request.Description,
+            DeadLine = request.DeadLine,
+            Priority = request.Priority.MapToPriorityModels(),
+            Status = request.Status.MapToStatusModels()
+        };
+    }
     
     public static TaskResponse MapToResponse(this Task task)
     {

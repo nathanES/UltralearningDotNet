@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Common.Mediator;
+using TaskManagement.Tasks.Commands.DeleteTask;
 using TaskManagement.Tasks.Interfaces;
 using TaskManagement.Tasks.Services;
 
@@ -11,9 +13,10 @@ public static class DeleteTaskEndpoint
     public static IEndpointRouteBuilder MapDeleteTask(this IEndpointRouteBuilder app)
     {
         app.MapDelete(ApiEndpoints.Tasks.Delete, async (Guid id,
-                [FromServices] ITaskService taskService, CancellationToken token) =>
+                [FromServices]Mediator mediator, CancellationToken token) =>
             {
-                var isDeleted = await taskService.DeleteByIdAsync(id, token);
+                var command = new DeleteTaskCommand(id);
+                var isDeleted = await mediator.SendAsync<DeleteTaskCommand, bool>(command, token);
                 if (!isDeleted)
                 {
                     return Results.NotFound();

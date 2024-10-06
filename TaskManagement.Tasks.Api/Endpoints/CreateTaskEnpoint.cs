@@ -20,7 +20,7 @@ public static class CreateTaskEnpoint
                 [FromServices]Mediator mediator, CancellationToken token) =>
             {
                 var command = request.MapToCommand();
-                await mediator.Send<CreateTaskCommand,bool>(command, token);
+                await mediator.SendAsync<CreateTaskCommand,bool>(command, token);
                 var response = new TaskManagement.Common.Models.Task(command.Id, 
                     command.Title,
                     command.Description,
