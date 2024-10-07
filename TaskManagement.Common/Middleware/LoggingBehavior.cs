@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace TaskManagement.Common.Mediator;
+namespace TaskManagement.Common.Middleware;
 
 public class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior<TRequest, TResponse>> logger)
     : IPipelineBehavior<TRequest, TResponse>

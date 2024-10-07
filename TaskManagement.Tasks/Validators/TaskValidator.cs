@@ -1,5 +1,4 @@
 using FluentValidation;
-using Task = TaskManagement.Common.Models.Task;
 
 namespace TaskManagement.Tasks.Validators;
 

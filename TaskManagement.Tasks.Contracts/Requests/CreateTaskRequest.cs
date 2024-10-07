@@ -1,5 +1,3 @@
-using TaskManagement.Common.Mediator;
-
 namespace TaskManagement.Tasks.Contracts.Requests;
 
 public class CreateTaskRequest 

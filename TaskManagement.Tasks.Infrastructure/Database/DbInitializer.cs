@@ -13,7 +13,7 @@ public class DbInitializer : IDbInitializer
         _tasksContext = tasksContext;
     }
 
-    public async Task InitializeAsync()
+    public async System.Threading.Tasks.Task InitializeAsync()
     {
         //Create the database if it is not
         await _tasksContext.Database.MigrateAsync();

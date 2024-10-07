@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using TaskManagement.Common.Mediator;
+using TaskManagement.Common.Middleware;
+using TaskManagement.Common.ResultPattern;
 using TaskManagement.Tasks.Api.Mapping;
 using TaskManagement.Tasks.Commands.GetAllTasks;
 using TaskManagement.Tasks.Contracts.Requests;
 using TaskManagement.Tasks.Contracts.Responses;
-using TaskManagement.Tasks.Interfaces;
-using TaskManagement.Tasks.Services;
-using Task = TaskManagement.Common.Models.Task;
+using Task = TaskManagement.Tasks.Models.Task;
 
 namespace TaskManagement.Tasks.Api.Endpoints;
 
@@ -17,16 +16,18 @@ public static class GetAllTasksEndpoint
     public static IEndpointRouteBuilder MapGetAllTasks(this IEndpointRouteBuilder app)
     {
         app.MapGet(ApiEndpoints.Tasks.GetAll, async ([AsParameters] GetAllTasksRequest request,
-                [FromServices] Mediator mediator, CancellationToken token) =>
+                [FromServices] IMediator mediator,
+                [FromServices]ILogger<ILogger> logger,
+                CancellationToken token) =>
             {
                 var command = request.MapToCommand();
-                var tasks = await mediator.SendAsync<GetAllTasksCommand ,IEnumerable<Task>>(command, token);
-                if (!tasks.Any())
+                var getTasksResult = await mediator.SendAsync<GetAllTasksCommand ,Result<IEnumerable<Task>>>(command, token);
+                if (getTasksResult.IsFailure)
                 {
-                    return Results.NotFound();
+                    logger.LogError(string.Join(", ", getTasksResult.Errors.Select(e => e.Message)));
+                    return Results.Problem( "An error occurred while retrieving all tasks");
                 }
-
-                var response = tasks.MapToResponse();
+                var response = getTasksResult.Response.MapToResponse();
                 return TypedResults.Ok(response);
             })
             .WithName($"{Name}V1")

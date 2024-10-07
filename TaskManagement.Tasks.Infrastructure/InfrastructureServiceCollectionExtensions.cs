@@ -19,7 +19,7 @@ public static class InfrastructureServiceCollectionExtensions
         }, ServiceLifetime.Scoped);
         
         services.AddScoped<IDbInitializer, DbInitializer>();
-        services.AddScoped<ITaskRepository, PostgreTaskRepository>();
+        services.AddScoped<ITaskRepository, PostgresTaskRepository>();
         return services;
     }
 }

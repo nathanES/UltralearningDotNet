@@ -2,7 +2,6 @@ using Asp.Versioning;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using TaskManagement.Common;
-using TaskManagement.Common.Mediator;
 using TaskManagement.Tasks;
 using TaskManagement.Tasks.Api;
 using TaskManagement.Tasks.Api.Endpoints;

@@ -1,6 +1,6 @@
 using Ardalis.GuardClauses;
 
-namespace TaskManagement.Common.Models;
+namespace TaskManagement.Tasks.Models;
 
 public class Task(Guid id, string title, string description, DateTime? deadLine, Priority? priority, Status? status)
 {

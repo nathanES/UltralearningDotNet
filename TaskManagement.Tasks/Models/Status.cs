@@ -1,4 +1,4 @@
-namespace TaskManagement.Common.Models;
+namespace TaskManagement.Tasks.Models;
 
 public enum Status
 {

@@ -1,11 +1,9 @@
-using TaskManagement.Common.Models;
 using TaskManagement.Users.Commands.CreateUser;
 using TaskManagement.Users.Commands.GetAllUsers;
 using TaskManagement.Users.Commands.UpdateUser;
 using TaskManagement.Users.Contracts.Requests;
 using TaskManagement.Users.Contracts.Responses;
 using TaskManagement.Users.Models;
-using Task = TaskManagement.Common.Models.Task;
 
 namespace TaskManagement.Users.Api.Mapping;
 

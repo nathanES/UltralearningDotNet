@@ -17,7 +17,7 @@ public static class InfrastructureServiceCollectionExtensions
         }, ServiceLifetime.Scoped);
         
         services.AddScoped<IDbInitializer, DbInitializer>();
-        services.AddScoped<IUserRepository, PostgreUserRepository>();
+        services.AddScoped<IUserRepository, PostgresUserRepository>();
         return services;
     }
 }

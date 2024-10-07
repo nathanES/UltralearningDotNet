@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using TaskManagement.Common.Mediator;
-using TaskManagement.Common.Models;
+using TaskManagement.Common.Middleware;
+using TaskManagement.Common.ResultPattern;
+using TaskManagement.Common.ResultPattern.Errors;
 using TaskManagement.Users.Api.Mapping;
 using TaskManagement.Users.Commands.UpdateUser;
 using TaskManagement.Users.Contracts.Requests;
 using TaskManagement.Users.Contracts.Responses;
-using TaskManagement.Users.Interfaces;
-using TaskManagement.Users.Services;
+using TaskManagement.Users.Models;
 
 namespace TaskManagement.Users.Api.Endpoints;
 
@@ -18,15 +18,23 @@ public static class UpdateUserEndpoint
     {
         app.MapPut(ApiEndpoints.Users.Update, async (Guid id,
                 [FromBody]UpdateUserRequest request, 
-                [FromServices] Mediator mediator, CancellationToken token) =>
+                [FromServices] IMediator mediator, [FromServices]ILogger<ILogger> logger,
+                CancellationToken token) =>
             {
                 var command = request.MapToCommand(id);
-                var updatedUser = await mediator.SendAsync<UpdateUserCommand, User?>(command, token);
-                if (updatedUser is null)
+                var updateUserResult = await mediator.SendAsync<UpdateUserCommand, Result<User>>(command, token);
+                
+                if (updateUserResult.IsFailure && updateUserResult.Errors.OfType<NotFoundError>().Any())
                 {
-                    return Results.NotFound();
+                    return Results.NotFound(new { Message = "User not found" });
                 }
-                var response = updatedUser?.MapToResponse();
+
+                if (updateUserResult.IsFailure)
+                {
+                    logger.LogError(string.Join(", ", updateUserResult.Errors.Select(e => e.Message)));
+                    return Results.Problem( "An error occurred while deleting the user");
+                }
+                var response = updateUserResult.Response.MapToResponse();
                 return TypedResults.Ok(response);
             })
             .WithName(Name)

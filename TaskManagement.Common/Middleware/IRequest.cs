@@ -1,4 +1,4 @@
-namespace TaskManagement.Common.Mediator;
+namespace TaskManagement.Common.Middleware;
 
 public interface IRequest<TResponse> { }
 

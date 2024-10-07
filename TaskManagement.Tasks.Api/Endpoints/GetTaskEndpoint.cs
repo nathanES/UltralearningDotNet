@@ -1,12 +1,11 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using TaskManagement.Common.Mediator;
+using TaskManagement.Common.Middleware;
+using TaskManagement.Common.ResultPattern;
+using TaskManagement.Common.ResultPattern.Errors;
 using TaskManagement.Tasks.Api.Mapping;
 using TaskManagement.Tasks.Commands.GetTask;
 using TaskManagement.Tasks.Contracts.Responses;
-using TaskManagement.Tasks.Interfaces;
-using TaskManagement.Tasks.Services;
-using Task = TaskManagement.Common.Models.Task;
+using Task = TaskManagement.Tasks.Models.Task;
 
 
 namespace TaskManagement.Tasks.Api.Endpoints;
@@ -18,16 +17,24 @@ public static class GetTaskEndpoint
     public static IEndpointRouteBuilder MapGetTask(this IEndpointRouteBuilder app)
     {
         app.MapGet(ApiEndpoints.Tasks.Get, async (Guid id,
-                [FromServices] Mediator mediator, CancellationToken token) =>
+                [FromServices] IMediator mediator,
+                [FromServices]ILogger<ILogger> logger,
+                CancellationToken token) =>
             {
                 var command = new GetTaskCommand(id);
-                var task = await mediator.SendAsync<GetTaskCommand, Task?>(command);
-                if (task is null)
+                var getTaskResult = await mediator.SendAsync<GetTaskCommand, Result<Task>>(command, token);
+                if (getTaskResult.IsFailure && getTaskResult.Errors.OfType<NotFoundError>().Any())
                 {
-                    return Results.NotFound();
+                    return Results.NotFound(new { Message = "Task not found" });
                 }
 
-                var response = task?.MapToResponse();
+                if (getTaskResult.IsFailure)
+                {
+                    logger.LogError(string.Join(", ", getTaskResult.Errors.Select(e => e.Message)));
+                    return Results.Problem( "An error occurred while retrieving the task");
+                }
+
+                var response = getTaskResult.Response.MapToResponse();
                 return TypedResults.Ok(response);
             })
             .WithName(Name)

@@ -1,11 +1,11 @@
-using TaskManagement.Common.Models;
 using TaskManagement.Tasks.Commands.CreateTask;
 using TaskManagement.Tasks.Commands.DeleteTask;
 using TaskManagement.Tasks.Commands.GetAllTasks;
 using TaskManagement.Tasks.Commands.UpdateTask;
 using TaskManagement.Tasks.Contracts.Requests;
 using TaskManagement.Tasks.Contracts.Responses;
-using Task = TaskManagement.Common.Models.Task;
+using TaskManagement.Tasks.Models;
+using Task = TaskManagement.Tasks.Models.Task;
 
 namespace TaskManagement.Tasks.Api.Mapping;
 

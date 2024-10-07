@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using TaskManagement.Common.Mediator;
+using TaskManagement.Common.Middleware;
+using TaskManagement.Common.ResultPattern;
+using TaskManagement.Common.ResultPattern.Errors;
 using TaskManagement.Tasks.Api.Mapping;
 using TaskManagement.Tasks.Commands.UpdateTask;
 using TaskManagement.Tasks.Contracts.Requests;
 using TaskManagement.Tasks.Contracts.Responses;
-using TaskManagement.Tasks.Interfaces;
-using TaskManagement.Tasks.Services;
-using Task = TaskManagement.Common.Models.Task;
+using Task = TaskManagement.Tasks.Models.Task;
 
 namespace TaskManagement.Tasks.Api.Endpoints;
 
@@ -18,15 +18,24 @@ public static class UpdateTaskEndpoint
     {
         app.MapPut(ApiEndpoints.Tasks.Update, async (Guid id,
                 [FromBody]UpdateTaskRequest request, 
-                [FromServices] Mediator mediator, CancellationToken token) =>
+                [FromServices] IMediator mediator,
+                [FromServices]ILogger<ILogger> logger,
+                CancellationToken token) =>
             {
                 var command = request.MapToCommand(id);
-                var updatedTask = await mediator.SendAsync<UpdateTaskCommand, Task?>(command, token);
-                if (updatedTask is null)
+                var updateTaskResult = await mediator.SendAsync<UpdateTaskCommand, Result<Task>>(command, token);
+                if (updateTaskResult.IsFailure && updateTaskResult.Errors.OfType<NotFoundError>().Any())
                 {
-                    return Results.NotFound();
+                    return Results.NotFound(new { Message = "Task not found" });
                 }
-                var response = updatedTask?.MapToResponse();
+
+                if (updateTaskResult.IsFailure)
+                {
+                    logger.LogError(string.Join(", ", updateTaskResult.Errors.Select(e => e.Message)));
+                    return Results.Problem( "An error occurred while deleting the task");
+                }
+                
+                var response = updateTaskResult.Response.MapToResponse();
                 return TypedResults.Ok(response);
             })
             .WithName(Name)

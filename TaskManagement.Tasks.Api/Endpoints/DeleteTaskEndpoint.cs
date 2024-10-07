@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using TaskManagement.Common.Mediator;
+using TaskManagement.Common.Middleware;
+using TaskManagement.Common.ResultPattern;
+using TaskManagement.Common.ResultPattern.Errors;
 using TaskManagement.Tasks.Commands.DeleteTask;
-using TaskManagement.Tasks.Interfaces;
-using TaskManagement.Tasks.Services;
 
 namespace TaskManagement.Tasks.Api.Endpoints;
 
@@ -13,15 +13,23 @@ public static class DeleteTaskEndpoint
     public static IEndpointRouteBuilder MapDeleteTask(this IEndpointRouteBuilder app)
     {
         app.MapDelete(ApiEndpoints.Tasks.Delete, async (Guid id,
-                [FromServices]Mediator mediator, CancellationToken token) =>
+                [FromServices]IMediator mediator,
+                [FromServices]ILogger<ILogger> logger,
+                CancellationToken token) =>
             {
                 var command = new DeleteTaskCommand(id);
-                var isDeleted = await mediator.SendAsync<DeleteTaskCommand, bool>(command, token);
-                if (!isDeleted)
+                var deleteTaskResult = await mediator.SendAsync<DeleteTaskCommand, Result<None>>(command, token);
+                if (deleteTaskResult.IsFailure && deleteTaskResult.Errors.OfType<NotFoundError>().Any())
                 {
-                    return Results.NotFound();
+                    return Results.NotFound(new { Message = "Task not found" });
                 }
 
+                if (deleteTaskResult.IsFailure)
+                {
+                    logger.LogError(string.Join(", ", deleteTaskResult.Errors.Select(e => e.Message)));
+                    return Results.Problem( "An error occurred while deleting the task");
+                }
+                
                 return Results.Ok();
             })
             .WithName(Name)

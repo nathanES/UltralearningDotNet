@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Task = TaskManagement.Common.Models.Task;
 
 namespace TaskManagement.Tasks.Infrastructure.Database;
 

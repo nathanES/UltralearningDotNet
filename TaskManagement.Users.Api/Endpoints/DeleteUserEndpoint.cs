@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using TaskManagement.Common.Mediator;
+using TaskManagement.Common.Middleware;
+using TaskManagement.Common.ResultPattern;
+using TaskManagement.Common.ResultPattern.Errors;
 using TaskManagement.Users.Commands.DeleteUser;
 using TaskManagement.Users.Interfaces;
 using TaskManagement.Users.Services;
@@ -13,13 +15,21 @@ public static class DeleteUserEndpoint
     public static IEndpointRouteBuilder MapDeleteUser(this IEndpointRouteBuilder app)
     {
         app.MapDelete(ApiEndpoints.Users.Delete, async (Guid id,
-                [FromServices] Mediator mediator, CancellationToken token) =>
+                [FromServices] IMediator mediator,
+                [FromServices]ILogger<ILogger> logger,
+                CancellationToken token) =>
             {
                 var command = new DeleteUserCommand(id);
-                var isDeleted = await mediator.SendAsync<DeleteUserCommand, bool>(command, token);
-                if (!isDeleted)
+                var deleteUserResult = await mediator.SendAsync<DeleteUserCommand, Result<None>>(command, token);
+                if (deleteUserResult.IsFailure && deleteUserResult.Errors.OfType<NotFoundError>().Any())
                 {
-                    return Results.NotFound();
+                    return Results.NotFound(new { Message = "User not found" });
+                }
+
+                if (deleteUserResult.IsFailure)
+                {
+                    logger.LogError(string.Join(", ", deleteUserResult.Errors.Select(e => e.Message)));
+                    return Results.Problem( "An error occurred while deleting the user");
                 }
 
                 return Results.Ok();

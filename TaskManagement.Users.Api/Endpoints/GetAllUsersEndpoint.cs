@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using TaskManagement.Common.Mediator;
-using TaskManagement.Common.Models;
+using TaskManagement.Common.Middleware;
+using TaskManagement.Common.ResultPattern;
 using TaskManagement.Users.Api.Mapping;
 using TaskManagement.Users.Commands.GetAllUsers;
 using TaskManagement.Users.Contracts.Requests;
 using TaskManagement.Users.Contracts.Responses;
 using TaskManagement.Users.Interfaces;
+using TaskManagement.Users.Models;
 using TaskManagement.Users.Services;
 
 namespace TaskManagement.Users.Api.Endpoints;
@@ -17,16 +18,19 @@ public static class GetAllUsersEndpoint
     public static IEndpointRouteBuilder MapGetAllUsers(this IEndpointRouteBuilder app)
     {
         app.MapGet(ApiEndpoints.Users.GetAll, async ([AsParameters] GetAllUsersRequest request, 
-                [FromServices] Mediator mediator, CancellationToken token) =>
+                [FromServices] IMediator mediator, 
+                [FromServices]ILogger<ILogger> logger,
+                CancellationToken token) =>
             {
                 var command = request.MapToCommand();
-                var users = await mediator.SendAsync<GetAllUsersCommand, IEnumerable<User>>(command, token);
-                if (!users.Any())
+                var getUsersResult = await mediator.SendAsync<GetAllUsersCommand, Result<IEnumerable<User>>>(command, token);
+                if (getUsersResult.IsFailure)
                 {
-                    return Results.NotFound();
-                }
+                    logger.LogError(string.Join(", ", getUsersResult.Errors.Select(e => e.Message)));
+                    return Results.Problem( "An error occurred while retrieving all users"); 
+                } 
 
-                var response = users.MapToResponse();
+                var response = getUsersResult.Response.MapToResponse();
                 return TypedResults.Ok(response);
             })
             .WithName($"{Name}V1")

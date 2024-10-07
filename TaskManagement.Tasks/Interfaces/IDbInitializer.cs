@@ -2,5 +2,5 @@ namespace TaskManagement.Tasks.Interfaces;
 
 public interface IDbInitializer
 {
-     Task InitializeAsync();
+     System.Threading.Tasks.Task  InitializeAsync();
 }

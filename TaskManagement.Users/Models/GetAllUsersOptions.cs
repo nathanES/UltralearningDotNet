@@ -1,5 +1,3 @@
-using TaskManagement.Common.Models;
-
 namespace TaskManagement.Users.Models;
 
 public class GetAllUsersOptions

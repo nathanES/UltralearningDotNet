@@ -1,6 +1,4 @@
 
-using TaskManagement.Common.Models;
-
 namespace TaskManagement.Tasks.Models;
 
 public class GetAllTasksOptions

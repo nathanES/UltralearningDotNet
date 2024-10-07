@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using TaskManagement.Common.Mediator;
+using TaskManagement.Common.Middleware;
+using TaskManagement.Common.ResultPattern;
 using TaskManagement.Users.Api.Mapping;
 using TaskManagement.Users.Commands.CreateUser;
 using TaskManagement.Users.Contracts.Requests;
 using TaskManagement.Users.Contracts.Responses;
+using TaskManagement.Users.Models;
 
 namespace TaskManagement.Users.Api.Endpoints;
 
@@ -14,10 +16,17 @@ public static class CreateUserEndpoint
     public static IEndpointRouteBuilder MapCreateUser(this IEndpointRouteBuilder app)
     {
         app.MapPost(ApiEndpoints.Users.Create, async ([FromBody] CreateUserRequest request,
-                [FromServices] Mediator mediator, CancellationToken token) =>
+                [FromServices] IMediator mediator, 
+                [FromServices]ILogger<ILogger> logger,
+                CancellationToken token) =>
             {
                 var command = request.MapToCommand();
-                await mediator.SendAsync<CreateUserCommand, bool>(command, token);
+                var createUserResult = await mediator.SendAsync<CreateUserCommand, Result<User>>(command, token);
+                if (createUserResult.IsFailure)
+                {
+                    logger.LogError(string.Join(", ", createUserResult.Errors.Select(e => e.Message)));
+                    return Results.Problem( "An error occurred while creating the user");
+                }
                 var response = new UserResponse
                 {
                     Id = command.Id,

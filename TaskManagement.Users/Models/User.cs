@@ -1,6 +1,6 @@
 using Ardalis.GuardClauses;
 
-namespace TaskManagement.Common.Models;
+namespace TaskManagement.Users.Models;
 
 public class User(Guid id, string username, string email)
 {

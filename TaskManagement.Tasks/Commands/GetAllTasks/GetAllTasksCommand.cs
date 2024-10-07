@@ -1,10 +1,9 @@
-using TaskManagement.Common.Mediator;
-using TaskManagement.Common.Models;
-using Task = TaskManagement.Common.Models.Task;
+using TaskManagement.Common.Middleware;
+using TaskManagement.Tasks.Models;
 
 namespace TaskManagement.Tasks.Commands.GetAllTasks;
 
-public class GetAllTasksCommand : IRequest<IEnumerable<Task>>
+public class GetAllTasksCommand : IRequest<Result<IEnumerable<Task>>>
 {
     public string? Title { get; set; }
 
