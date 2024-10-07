@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using TaskManagement.Common.Interfaces;
 using TaskManagement.Users.Infrastructure.Database;
 using TaskManagement.Users.Infrastructure.Repositories;
 using TaskManagement.Users.Interfaces;
@@ -8,7 +9,7 @@ namespace TaskManagement.Users.Infrastructure;
 
 public static class InfrastructureServiceCollectionExtensions
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddUserInfrastructure(this IServiceCollection services, string connectionString)
     {
 
         services.AddDbContext<UsersContext>(options =>

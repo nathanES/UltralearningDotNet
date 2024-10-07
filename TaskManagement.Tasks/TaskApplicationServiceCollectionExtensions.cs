@@ -5,6 +5,7 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TaskManagement.Common;
 using TaskManagement.Common.Middleware;
+using TaskManagement.Tasks.Commands;
 using TaskManagement.Tasks.Commands.CreateTask;
 using TaskManagement.Tasks.Commands.DeleteTask;
 using TaskManagement.Tasks.Commands.GetAllTasks;
@@ -18,16 +19,15 @@ public static class TaskApplicationServiceCollectionExtensions
 {
     public static IServiceCollection AddTaskApplication(this IServiceCollection services)
     {
-        services.TryAddCommonServices();
         services.AddScoped<ITaskService, TaskService>();
+        services.AddRequestHandlersFromAssembly(typeof(ICommandMarker).Assembly);
+        // services.AddScoped<IRequestHandler<CreateTaskCommand, Result<Task>>, CreateTaskHandler>();
+        // services.AddScoped<IRequestHandler<DeleteTaskCommand, Result<None>>, DeleteTaskHandler>();
+        // services.AddScoped<IRequestHandler<GetAllTasksCommand, Result<IEnumerable<Task>>>, GetAllTasksHandler>();
+        // services.AddScoped<IRequestHandler<UpdateTaskCommand, Result<Task>>, UpdateTaskHandler>();
+        // services.AddScoped<IRequestHandler<GetTaskCommand, Result<Task>>, GetTaskHandler>();
 
-        services.AddScoped<IRequestHandler<CreateTaskCommand, Result<Task>>, CreateTaskHandler>();
-        services.AddScoped<IRequestHandler<DeleteTaskCommand, Result<None>>, DeleteTaskHandler>();
-        services.AddScoped<IRequestHandler<GetAllTasksCommand, Result<IEnumerable<Task>>>, GetAllTasksHandler>();
-        services.AddScoped<IRequestHandler<UpdateTaskCommand, Result<Task>>, UpdateTaskHandler>();
-        services.AddScoped<IRequestHandler<GetTaskCommand, Result<Task>>, GetTaskHandler>();
-
-        services.AddValidatorsFromAssemblyContaining<IValidatorMarker>(ServiceLifetime.Singleton);
+        services.AddValidatorsFromAssemblyContaining<IValidatorMarker>(ServiceLifetime.Transient);
         return services;
     }
 }

@@ -1,4 +1,6 @@
 
+using TaskManagement.Common.Models;
+
 namespace TaskManagement.Tasks.Models;
 
 public class GetAllTasksOptions
@@ -7,7 +9,7 @@ public class GetAllTasksOptions
 
     public string? Description { get; set; }
 
-    public DateTime? DeadLine { get; set; }
+    public DateTime? Deadline { get; set; }
     
     public Priority? Priority { get; set; }
 

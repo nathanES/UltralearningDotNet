@@ -10,9 +10,10 @@ internal class UpdateTaskHandler(ITaskService taskService) : IRequestHandler<Upd
         var task = new Task(request.Id,
             request.Title,
             request.Description,
-            request.DeadLine,
+            request.Deadline,
             request.Priority,
-            request.Status);
+            request.Status,
+            request.UserId);
         return await taskService.UpdateAsync(task, token);
     }
 }

@@ -1,6 +1,3 @@
 namespace TaskManagement.Tasks.Validators;
 
-public interface IValidatorMarker
-{
-    
-}
+public interface IValidatorMarker { }

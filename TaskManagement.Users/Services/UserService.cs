@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using TaskManagement.Common.Models;
 using TaskManagement.Common.ResultPattern;
 using TaskManagement.Common.ResultPattern.Errors;
 using TaskManagement.Users.Interfaces;
@@ -7,16 +8,10 @@ using TaskManagement.Users.Models;
 
 namespace TaskManagement.Users.Services;
 
-public class UserService(IUserRepository userRepository, IValidator<User> validator, ILogger<UserService> logger): IUserService
+public class UserService(IUserRepository userRepository,  ILogger<UserService> logger): IUserService
 {
     public async Task<Result<User>> CreateAsync(User user, CancellationToken token = default)
     {
-        var validationResult = await ValidateUserAsync(user, token);
-        if (validationResult.IsFailure)
-        {
-            return Result<User>.Failure(validationResult.Errors);
-        }
-
         var isUserExistResult =await userRepository.ExistsByIdAsync(user.Id, token);
         if (isUserExistResult.IsFailure)
         {
@@ -38,12 +33,6 @@ public class UserService(IUserRepository userRepository, IValidator<User> valida
 
     public async Task<Result<User>> UpdateAsync(User user, CancellationToken token = default)
     {
-        var validationResult = await ValidateUserAsync(user, token);
-        if (validationResult.IsFailure)
-        {
-            return Result<User>.Failure(validationResult.Errors);
-        }
-
         var isUserExistResult = await userRepository.ExistsByIdAsync(user.Id, token);
         if (isUserExistResult.IsFailure)
         {
@@ -69,17 +58,9 @@ public class UserService(IUserRepository userRepository, IValidator<User> valida
     {
         return await userRepository.DeleteByIdAsync(id, token);
     }
-    private async Task<Result<None>> ValidateUserAsync(User user, CancellationToken token)
+
+    public async Task<Result<bool>> ExistAsync(Guid id, CancellationToken token = default)
     {
-        try
-        {
-            await validator.ValidateAndThrowAsync(user, token);
-            return Result<None>.Success(None.Value);
-        }
-        catch (ValidationException ex)
-        {
-            logger.LogWarning("Validation failed for user: {Errors}", ex.Message);
-            return Result<None>.Failure(new ValidationError(ex.Message, "User", user.Id.ToString()));
-        }
+        return await userRepository.ExistsByIdAsync(id, token);
     }
 }

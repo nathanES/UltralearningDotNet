@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using TaskManagement.Common.Models;
 using TaskManagement.Common.ResultPattern;
 using TaskManagement.Common.ResultPattern.Errors;
 using TaskManagement.Users.Infrastructure.Database;

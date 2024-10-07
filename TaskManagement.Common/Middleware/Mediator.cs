@@ -13,13 +13,13 @@ internal class Mediator(IServiceProvider serviceProvider, ILogger<Mediator> logg
             throw new InvalidOperationException($"No handler found for {typeof(TRequest).Name}");
         }
         var behaviors = serviceProvider.GetServices<IPipelineBehavior<TRequest, TResponse>>().ToList();
-
+        logger.LogInformation($"Found {behaviors.Count} behaviors in the pipeline.");
 
         RequestHandlerDelegate<TResponse> handlerDelegate = () => handler.HandleAsync(request, token);
         foreach (var behavior in behaviors.AsEnumerable().Reverse())
         {
             var next = handlerDelegate;
-            handlerDelegate = () => behavior.Handle(request, next, token);
+            handlerDelegate = () => behavior.HandleAsync(request, next, token);
         }
 
         return await handlerDelegate();

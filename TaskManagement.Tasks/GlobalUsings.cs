@@ -1,2 +1,2 @@
 global using TaskManagement.Common.ResultPattern;
-global using Task = TaskManagement.Tasks.Models.Task;
+global using Task = TaskManagement.Common.Models.Task;

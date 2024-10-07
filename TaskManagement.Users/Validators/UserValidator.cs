@@ -1,4 +1,5 @@
 using FluentValidation;
+using TaskManagement.Common.Models;
 using TaskManagement.Users.Models;
 
 namespace TaskManagement.Users.Validators;

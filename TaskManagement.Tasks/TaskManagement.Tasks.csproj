@@ -17,6 +17,7 @@
     <ItemGroup>
       <ProjectReference Include="..\TaskManagement.Common\TaskManagement.Common.csproj" />
       <ProjectReference Include="..\TaskManagement.Tasks.Contracts\TaskManagement.Tasks.Contracts.csproj" />
+      <ProjectReference Include="..\TaskManagement.Users.Contracts\TaskManagement.Users.Contracts.csproj" />
     </ItemGroup>
 
     <ItemGroup>

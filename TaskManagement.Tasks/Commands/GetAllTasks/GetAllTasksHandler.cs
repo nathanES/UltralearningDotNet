@@ -12,7 +12,7 @@ internal class GetAllTasksHandler(ITaskService taskService) : IRequestHandler<Ge
         {
             Title = request.Title,
             Description = request.Description,
-            DeadLine = request.DeadLine,
+            Deadline = request.Deadline,
             Priority = request.Priority,
             Status = request.Status,
             Page = request.Page,

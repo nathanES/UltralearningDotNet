@@ -12,6 +12,8 @@ public class TasksContext(DbContextOptions<TasksContext> options) : DbContext(op
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).IsRequired().HasMaxLength(255);
             // Other configurations
+            entity.Property(t => t.UserId)
+                .IsRequired(false);
         });
         base.OnModelCreating(modelBuilder);
     }

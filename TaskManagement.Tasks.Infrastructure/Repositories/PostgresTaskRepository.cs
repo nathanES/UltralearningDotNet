@@ -73,9 +73,9 @@ public class PostgresTaskRepository(ILogger<PostgresTaskRepository> logger, Task
                 query = query.Where(t => t.Priority == options.Priority);
             }
 
-            if (options.DeadLine.HasValue)
+            if (options.Deadline.HasValue)
             {
-                query = query.Where(t => t.DeadLine == options.DeadLine);
+                query = query.Where(t => t.Deadline == options.Deadline);
             }
 
             if (options.Status.HasValue)
@@ -122,7 +122,8 @@ public class PostgresTaskRepository(ILogger<PostgresTaskRepository> logger, Task
             taskToUpdate.UpdatePriority(task.Priority);
             taskToUpdate.UpdateStatus(task.Status);
             taskToUpdate.UpdateTitle(task.Title);
-            taskToUpdate.UpdateDeadLine(task.DeadLine);
+            taskToUpdate.UpdateDeadline(task.Deadline);
+            taskToUpdate.UpdateUserId(task.UserId);
 
             await context.SaveChangesAsync(token);
             return Result<Task>.Success(taskToUpdate);

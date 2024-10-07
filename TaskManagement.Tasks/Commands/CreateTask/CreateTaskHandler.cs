@@ -11,9 +11,10 @@ internal class CreateTaskHandler(ITaskService taskService) : IRequestHandler<Cre
             Guid.NewGuid(),
             request.Title,
             request.Description,
-            request.DeadLine,
+            request.Deadline,
             request.Priority,
-            request.Status
+            request.Status,
+            request.UserId
         );
 
         return await taskService.CreateAsync(task, token);
