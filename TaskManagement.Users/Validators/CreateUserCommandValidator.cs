@@ -7,6 +7,8 @@ public class CreateUserCommandValidator: AbstractValidator<CreateUserCommand>
 {
     public CreateUserCommandValidator()
     {
+        RuleFor(x => x)
+            .NotNull();
         RuleFor(x => x.Id)
             .NotEmpty();
         RuleFor(x => x.Username)

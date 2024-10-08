@@ -1,7 +1,6 @@
 using FluentValidation;
 using TaskManagement.Common.Models;
 using TaskManagement.Tasks.Commands.CreateTask;
-using TaskManagement.Tasks.Models;
 
 namespace TaskManagement.Tasks.Validators;
 
@@ -9,6 +8,8 @@ public class CreateTaskCommandValidator : AbstractValidator<CreateTaskCommand>
 {
     public CreateTaskCommandValidator()
     {
+        RuleFor(x => x)
+            .NotNull();
         RuleFor(x => x.Id)
             .NotEmpty();
         RuleFor(x => x.Title)

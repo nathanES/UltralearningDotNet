@@ -1,3 +1,4 @@
+using System.Collections;
 using Microsoft.Extensions.Logging;
 using TaskManagement.Common.Commands;
 using TaskManagement.Common.Middleware;
@@ -7,11 +8,17 @@ using TaskManagement.Tasks.Models;
 
 namespace TaskManagement.Tasks.Services;
 
-public class TaskService(ITaskRepository taskRepository, ILogger<TaskService> logger, IMediator mediator)
+internal class TaskService(ITaskRepository taskRepository, ILogger<TaskService> logger, IMediator mediator)
     : ITaskService
 {
     public async Task<Result<Task>> CreateAsync(Task task, CancellationToken token = default)
     {
+        if (task == null)
+        {
+            logger.LogError("Null task passed to CreateAsync");
+            return Result<Task>.Failure(new ValidationError("Task cannot be null", "Task"));
+        }
+        
         var isTaskExistResult = await taskRepository.ExistsByIdAsync(task.Id, token);
         if (isTaskExistResult.IsFailure)
         {
@@ -43,11 +50,22 @@ public class TaskService(ITaskRepository taskRepository, ILogger<TaskService> lo
     public async Task<Result<IEnumerable<Task>>> GetAllAsync(GetAllTasksOptions options,
         CancellationToken token = default)
     {
+        if (options == null)
+        {
+            logger.LogError("Null options passed to GetAllAsync");
+            return Result<IEnumerable<Task>>.Failure(new ValidationError("Options cannot be null", "Task"));
+        } 
         return await taskRepository.GetAllAsync(options, token);
     }
 
     public async Task<Result<Task>> UpdateAsync(Task task, CancellationToken token = default)
     {
+        if (task == null)
+        {
+            logger.LogError("Null task passed to UpdateAsync");
+            return Result<Task>.Failure(new ValidationError("Task cannot be null", "Task"));
+        }
+        
         var isTaskExistResult = await taskRepository.ExistsByIdAsync(task.Id, token);
         if (isTaskExistResult.IsFailure)
         {
@@ -59,24 +77,6 @@ public class TaskService(ITaskRepository taskRepository, ILogger<TaskService> lo
         {
             logger.LogWarning("Task does not exist");
             return Result<Task>.Failure(new ConflictError("Task does not exist", "Task", task.Id.ToString()));
-        }
-
-        if (task.UserId.HasValue)
-        {
-            var isUserExistResult =
-                await mediator.SendAsync<ExistUserCommand, Result<bool>>(new ExistUserCommand(task.UserId.Value),
-                    token);
-            if (isUserExistResult.IsFailure)
-            {
-                logger.LogWarning("A technical error occurred while checking for user existence");
-                return Result<Task>.Failure(isUserExistResult.Errors);
-            }
-
-            if (!isUserExistResult.Response)
-            {
-                logger.LogWarning("User doesn't exists");
-                return Result<Task>.Failure(new ConflictError("User doesn't exists", "User", task.UserId.ToString()));
-            }
         }
 
         var updateTaskResult = await taskRepository.UpdateAsync(task, token);
@@ -91,6 +91,23 @@ public class TaskService(ITaskRepository taskRepository, ILogger<TaskService> lo
 
     public async Task<Result<None>> DeleteByIdAsync(Guid id, CancellationToken token = default)
     {
+        var isTaskExistResult = await taskRepository.ExistsByIdAsync(id, token);
+        if (isTaskExistResult.IsFailure)
+        {
+            logger.LogWarning("A technical error occurred while checking for task existence");
+            return Result<None>.Failure(isTaskExistResult.Errors);
+        }
+
+        if (!isTaskExistResult.Response)
+        {
+            logger.LogWarning("Task doesn't exist");
+            return Result<None>.Failure(new NotFoundError("Task", id.ToString()));
+        }
         return await taskRepository.DeleteByIdAsync(id, token);
+    }
+
+    public async Task<Result<bool>> ExistAsync(Guid id, CancellationToken token = default)
+    {
+        return await taskRepository.ExistsByIdAsync(id, token);
     }
 }

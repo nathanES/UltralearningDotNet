@@ -7,6 +7,8 @@ public class DeleteTaskCommandValidator : AbstractValidator<DeleteTaskCommand>
 {
     public DeleteTaskCommandValidator()
     {
+        RuleFor(x => x)
+            .NotNull();
         RuleFor(x => x.Id)
             .NotEmpty();
     }

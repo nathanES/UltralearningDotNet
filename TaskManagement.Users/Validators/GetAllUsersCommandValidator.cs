@@ -7,6 +7,8 @@ public class GetAllUsersCommandValidator: AbstractValidator<GetAllUsersCommand>
 {
     public GetAllUsersCommandValidator()
     {
+        RuleFor(x => x)
+            .NotNull();
         RuleFor(x => x.Page)
             .GreaterThan(0).WithMessage("Page number must be greater than 0.");
         

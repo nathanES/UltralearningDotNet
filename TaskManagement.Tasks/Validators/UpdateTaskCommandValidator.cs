@@ -9,6 +9,8 @@ public class UpdateTaskCommandValidator : AbstractValidator<UpdateTaskCommand>
 {
     public UpdateTaskCommandValidator()
     {
+        RuleFor(x => x)
+            .NotNull();
         RuleFor(x => x.Id)
             .NotEmpty();
         RuleFor(x => x.Title)

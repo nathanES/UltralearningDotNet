@@ -12,6 +12,11 @@ public class UserService(IUserRepository userRepository,  ILogger<UserService> l
 {
     public async Task<Result<User>> CreateAsync(User user, CancellationToken token = default)
     {
+        if (user == null)
+        {
+            logger.LogError("Null user passed to CreateAsync");
+            return Result<User>.Failure(new ValidationError("User cannot be null", "User"));
+        }
         var isUserExistResult =await userRepository.ExistsByIdAsync(user.Id, token);
         if (isUserExistResult.IsFailure)
         {
@@ -28,11 +33,22 @@ public class UserService(IUserRepository userRepository,  ILogger<UserService> l
 
     public async Task<Result<IEnumerable<User>>> GetAllAsync(GetAllUsersOptions options, CancellationToken token = default)
     {
+        if (options == null)
+        {
+            logger.LogError("Null options passed to GetAllAsync");
+            return Result<IEnumerable<User>>.Failure(new ValidationError("Options cannot be null", "User"));
+        } 
         return await userRepository.GetAllAsync(options, token);
     }
 
     public async Task<Result<User>> UpdateAsync(User user, CancellationToken token = default)
     {
+        if (user == null)
+        {
+            logger.LogError("Null user passed to CreateAsync");
+            return Result<User>.Failure(new ValidationError("User cannot be null", "User"));
+        }
+        
         var isUserExistResult = await userRepository.ExistsByIdAsync(user.Id, token);
         if (isUserExistResult.IsFailure)
         {
@@ -56,6 +72,18 @@ public class UserService(IUserRepository userRepository,  ILogger<UserService> l
 
     public async Task<Result<None>> DeleteByIdAsync(Guid id, CancellationToken token = default)
     {
+        var isUserExistResult = await userRepository.ExistsByIdAsync(id, token);
+        if (isUserExistResult.IsFailure)
+        {
+            logger.LogWarning("A technical error occurred while checking for user existence");
+            return Result<None>.Failure(isUserExistResult.Errors);
+        }
+
+        if (!isUserExistResult.Response)
+        {
+            logger.LogWarning("User doesn't exist");
+            return Result<None>.Failure(new NotFoundError("User", id.ToString()));
+        }
         return await userRepository.DeleteByIdAsync(id, token);
     }
 

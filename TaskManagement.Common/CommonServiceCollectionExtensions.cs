@@ -14,6 +14,7 @@ public static class CommonServiceCollectionExtensions
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UserExistenceBehavior<,>));
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TaskExistenceBehavior<,>));
 
         return services;
     }

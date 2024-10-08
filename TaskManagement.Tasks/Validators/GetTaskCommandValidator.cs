@@ -7,6 +7,8 @@ public class GetTaskCommandValidator : AbstractValidator<GetTaskCommand>
 {
     public GetTaskCommandValidator()
     {
+        RuleFor(x => x)
+            .NotNull();
         RuleFor(x => x.Id)
             .NotEmpty();
     }
