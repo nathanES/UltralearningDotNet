@@ -1,4 +1,4 @@
-namespace TaskManagement.Common.Commands;
+namespace TaskManagement.Common.Interfaces.Commands;
 
 public interface ITaskCommand
 {

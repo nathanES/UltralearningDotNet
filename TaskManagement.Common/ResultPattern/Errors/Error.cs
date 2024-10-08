@@ -26,4 +26,5 @@ public class ErrorCodes
     public const string ValidationError = "VALIDATION_ERROR";
     public const string Unauthorized = "UNAUTHORIZED";
     public const string Conflict = "CONFLICT";
+    public const string GenericError = "GENERIC_ERROR";
 }

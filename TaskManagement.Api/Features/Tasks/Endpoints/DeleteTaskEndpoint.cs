@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Api.Auth;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.ResultPattern;
 using TaskManagement.Common.ResultPattern.Errors;
@@ -34,7 +35,8 @@ public static class DeleteTaskEndpoint
             })
             .WithName(Name)
             .Produces(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);
         return app;
     }
 }

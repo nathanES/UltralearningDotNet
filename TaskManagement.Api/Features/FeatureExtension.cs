@@ -1,3 +1,4 @@
+using TaskManagement.Api.Features.JWT;
 using TaskManagement.Api.Features.Tasks;
 using TaskManagement.Api.Features.Users;
 
@@ -9,6 +10,7 @@ public static class FeatureExtension
     {
         services.AddTaskFeatureServices(config);
         services.AddUserFeatureServices(config);
+        services.AddJwtFeatureServices(config);
         return services;
     }  
 }

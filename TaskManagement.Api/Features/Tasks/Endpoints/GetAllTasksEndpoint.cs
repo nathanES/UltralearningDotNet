@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Api.Auth;
 using TaskManagement.Api.Features.Tasks.Mapping;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.ResultPattern;
@@ -34,7 +35,8 @@ public static class GetAllTasksEndpoint
             .Produces<TasksResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .WithApiVersionSet(ApiVersioning.VersionSet)
-            .HasApiVersion(1.0);
+            .HasApiVersion(1.0)
+            .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);;
         return app;
     }
 }

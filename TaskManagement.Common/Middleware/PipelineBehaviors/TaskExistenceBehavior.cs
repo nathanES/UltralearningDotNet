@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
 using TaskManagement.Common.Commands;
+using TaskManagement.Common.Interfaces;
+using TaskManagement.Common.Interfaces.Commands;
 using TaskManagement.Common.ResultPattern;
 using TaskManagement.Common.ResultPattern.Errors;
 
@@ -13,45 +15,60 @@ public class TaskExistenceBehavior<TRequest, TResponse>(
     public async Task<TResponse> HandleAsync(TRequest request, RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (request is not ITaskCommand taskCommand)
+        if (request is not ITaskCommand && request is not IShouldCheckTaskExistenceCommand)
         {
             return await next();
         }
 
-        var isCreateCommand = request.GetType().Name.Contains("CreateTaskCommand");
-        var isUpdateCommand = request.GetType().Name.Contains("UpdateTaskCommand");
+        var isCreateCommand = request is ICreateCommand;
+        var isUpdateCommand = request is IUpdateCommand;
         
-        var taskId = taskCommand.Id;
+        var taskId = request is ITaskCommand taskCommand
+            ? taskCommand.Id
+            : ((IShouldCheckTaskExistenceCommand)request).TaskId;
+        
+        if (!taskId.HasValue)
+        {
+            logger.LogInformation("TaskId don't have value");
+            return await next();
+        } 
+        
         var isTaskExistResult =
-            await mediator.SendAsync<ExistTaskCommand, Result<bool>>(new ExistTaskCommand(taskId),
+            await mediator.SendAsync<ExistTaskCommand, Result<bool>>(new ExistTaskCommand(taskId.Value),
                 cancellationToken);
         
         if (isTaskExistResult.IsFailure)
         {
             logger.LogWarning("A technical error occurred while checking for task existence");
-            var failureResult = Activator.CreateInstance(typeof(Result<>).MakeGenericType(typeof(TResponse)),
-                isTaskExistResult.Errors);
-            return (TResponse)failureResult!;
+            return CreateFailureResult<TResponse>(isTaskExistResult.Errors);
         }
 
         if (!isTaskExistResult.Response && isUpdateCommand)
         {
             logger.LogWarning("Task does not exist");
-            var notFoundError = new NotFoundError("Task", taskId.ToString());
-            var failureResult =
-                Activator.CreateInstance(typeof(Result<>).MakeGenericType(typeof(TResponse)), notFoundError);
-            return (TResponse)failureResult!;
+            return CreateFailureResult<TResponse>(new NotFoundError("Task", taskId.ToString()));
+
         }
 
         if (isTaskExistResult.Response && isCreateCommand)
         {
             logger.LogWarning("Task with the same ID already exists");
-            var conflictError = new ConflictError("Task already exists", "Task", taskId.ToString());
-            var failureResult =
-                Activator.CreateInstance(typeof(Result<>).MakeGenericType(typeof(TResponse)), conflictError);
-            return (TResponse)failureResult!;
+            return CreateFailureResult<TResponse>(new ConflictError("Task already exists", "Task", taskId.ToString()));
         }
 
         return await next();
     }
+    private TResponse CreateFailureResult<T>(Error error)
+    {
+        var resultType = typeof(Result<>).MakeGenericType(typeof(TResponse));
+        var failureResult = Activator.CreateInstance(resultType, error);
+        return (TResponse)failureResult!;
+    }
+    private TResponse CreateFailureResult<T>(List<Error> errors)
+    {
+        var resultType = typeof(Result<>).MakeGenericType(typeof(TResponse));
+        var failureResult = Activator.CreateInstance(resultType, errors);
+        return (TResponse)failureResult!;
+    }
+
 }

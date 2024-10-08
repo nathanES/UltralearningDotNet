@@ -1,8 +1,14 @@
 namespace TaskManagement.Api;
 
-public static class ApiEndpoints
+internal static class ApiEndpoints
 {
     private const string ApiBase = "api";
+
+    public static class Jwt
+    {
+        private const string Base = $"{ApiBase}/jwt";
+        public const string Create = Base;
+    }
 
     public static class Users
     {

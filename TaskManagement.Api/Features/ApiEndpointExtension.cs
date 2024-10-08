@@ -1,3 +1,4 @@
+using TaskManagement.Api.Features.JWT.Endpoints;
 using TaskManagement.Api.Features.Tasks.Endpoints;
 using TaskManagement.Api.Features.Users.Endpoints;
 
@@ -9,6 +10,7 @@ public static class ApiEndpointExtension
     {
         app.AddTasksEndpoints();
         app.AddUsersEndpoints();
+        app.AddJwtEndpoint();
         return app;
     }
 }

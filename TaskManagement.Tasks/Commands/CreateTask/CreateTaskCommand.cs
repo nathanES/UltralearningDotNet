@@ -1,11 +1,13 @@
 using TaskManagement.Common.Commands;
+using TaskManagement.Common.Interfaces;
+using TaskManagement.Common.Interfaces.Commands;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.Models;
 
 namespace TaskManagement.Tasks.Commands.CreateTask;
 
 public class CreateTaskCommand(Guid id, string title, string description, DateTime? deadline, Priority? priority, Status? status, Guid? userId )
-    : IRequest<Result<Task>>, ITaskCommand
+    : IRequest<Result<Task>>, ITaskCommand, IShouldCheckUserExistenceCommand, ICreateCommand
 {
     public Guid Id { get; } = id;
     public string Title { get; } = title;

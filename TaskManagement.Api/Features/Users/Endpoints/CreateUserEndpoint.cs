@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Api.Auth;
 using TaskManagement.Api.Features.Users.Mapping;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.Models;
@@ -27,18 +28,15 @@ public static class CreateUserEndpoint
                     logger.LogError(string.Join(", ", createUserResult.Errors.Select(e => e.Message)));
                     return Results.Problem( "An error occurred while creating the user");
                 }
-                var response = new UserResponse
-                {
-                    Id = command.Id,
-                    Email = command.Email,
-                    Username = command.Username
-                };
+
+                var response = createUserResult.Response.MapToResponse();
                 return TypedResults.CreatedAtRoute(response, $"{CreateUserEndpoint.Name}V1", new { id = response.Id });
             })
             .WithName($"{Name}V1")
             .Produces<UserResponse>(StatusCodes.Status201Created)
             .WithApiVersionSet(ApiVersioning.VersionSet)
-            .HasApiVersion(1.0);
+            .HasApiVersion(1.0)
+            .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);
         return app;
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManagement.Api.Auth;
 using TaskManagement.Api.Features.Users.Mapping;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.Models;
@@ -39,7 +40,8 @@ public static class UpdateUserEndpoint
             })
             .WithName(Name)
             .Produces<UserResponse>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);
         return app;
     }
 }
