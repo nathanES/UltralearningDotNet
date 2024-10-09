@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Api.Features.JWT.Mapping;
+using TaskManagement.Api.Versioning;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.ResultPattern;
 using TaskManagement.Jwt.Commands.CreateJwt;

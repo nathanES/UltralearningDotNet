@@ -1,3 +1,4 @@
+using TaskManagement.Api.Auth;
 using TaskManagement.Jwt.Commands;
 using TaskManagement.Jwt.Commands.CreateJwt;
 using TaskManagement.Jwt.Contracts.Requests;
@@ -12,8 +13,12 @@ public static class ContractMapping
         {
             UserId = request.UserId,
             Email = request.Email,
-            Username = request.Username,
-            CustomClaims = request.CustomClaims
+            CustomClaims = new Dictionary<string, object>()
+            {
+                {AuthConstants.AdminUserClaimName, request.IsAdmin.ToString()},
+                {AuthConstants.TrustedMemberClaimName, request.IsTrustedMember.ToString()},
+                {"username" , request.Username}
+            }
         };
     }
 }

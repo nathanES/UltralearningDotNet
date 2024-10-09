@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Api.Auth;
 using TaskManagement.Api.Features.Users.Mapping;
+using TaskManagement.Api.Versioning;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.Models;
 using TaskManagement.Common.ResultPattern;

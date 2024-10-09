@@ -1,7 +1,7 @@
 using Asp.Versioning.Builder;
 using Asp.Versioning.Conventions;
 
-namespace TaskManagement.Api;
+namespace TaskManagement.Api.Versioning;
 
 public static class ApiVersioning
 {

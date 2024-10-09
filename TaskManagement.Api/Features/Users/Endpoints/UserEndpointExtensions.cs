@@ -4,11 +4,12 @@ public static class UserEndpointExtensions
 {
    public static IEndpointRouteBuilder AddUsersEndpoints(this IEndpointRouteBuilder app)
    {
-      app.MapCreateUser();
-      app.MapGetUser();
-      app.MapGetAllUsers();
-      app.MapUpdateUser();
-      app.MapDeleteUser();
+      var usersGroup = app.MapGroup("users");
+      usersGroup.MapCreateUser();
+      usersGroup.MapGetUser();
+      usersGroup.MapGetAllUsers();
+      usersGroup.MapUpdateUser();
+      usersGroup.MapDeleteUser();
       return app;
    }
 }

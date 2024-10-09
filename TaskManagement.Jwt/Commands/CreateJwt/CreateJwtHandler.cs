@@ -37,21 +37,30 @@ internal class CreateJwtHandler : IRequestHandler<CreateJwtCommand, Result<strin
                 new(JwtRegisteredClaimNames.Sub, request.Email),
                 new(JwtRegisteredClaimNames.Email, request.Email),
                 new("userid", request.UserId.ToString()),
-                new("username", request.Username)
             };
 
             foreach (var claimPair in request.CustomClaims)
             {
-                var jsonElement = (JsonElement)claimPair.Value;
-                var valueType = jsonElement.ValueKind switch
-                {
-                    JsonValueKind.True => ClaimValueTypes.Boolean,
-                    JsonValueKind.False => ClaimValueTypes.Boolean,
-                    JsonValueKind.Number => ClaimValueTypes.Double,
-                    _ => ClaimValueTypes.String
-                };
+                string claimValue;
+                string valueType;
 
-                var claim = new Claim(claimPair.Key, claimPair.Value.ToString()!, valueType);
+                // Check if the value is "True" or "False" (case-insensitive)
+                if (bool.TryParse(claimPair.Value.ToString(), out bool boolValue))
+                {
+                    claimValue = boolValue.ToString().ToLower(); // Ensure lowercase 'true'/'false'
+                    valueType = ClaimValueTypes.Boolean;
+                }
+                else
+                {
+                    // Treat the value as a string
+                    claimValue = claimPair.Value.ToString();
+                    valueType = ClaimValueTypes.String;
+                }
+
+                if (claimValue is null)
+                    continue;
+                
+                var claim = new Claim(claimPair.Key, claimValue, valueType);
                 claims.Add(claim);
             }
 

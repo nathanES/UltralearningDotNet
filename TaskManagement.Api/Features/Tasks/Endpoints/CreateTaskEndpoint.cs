@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Api.Auth;
 using TaskManagement.Api.Features.Tasks.Mapping;
+using TaskManagement.Api.Versioning;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.ResultPattern;
 using TaskManagement.Tasks.Commands.CreateTask;
@@ -13,7 +14,6 @@ namespace TaskManagement.Api.Features.Tasks.Endpoints;
 public static class CreateTaskEndpoint
 {
     public const string Name = "CreateTask";
-
     public static IEndpointRouteBuilder MapCreateTask(this IEndpointRouteBuilder app)
     {
         app.MapPost(ApiEndpoints.Tasks.Create, async ([FromBody] CreateTaskRequest request,
