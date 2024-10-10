@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using TaskManagement.Common.Commands;
 using TaskManagement.Common.Interfaces;
@@ -29,20 +30,20 @@ public class TaskExistenceBehavior<TRequest, TResponse>(
         if (isTaskExistResult.IsFailure)
         {
             logger.LogWarning("A technical error occurred while checking for task existence");
-            return CreateFailureResult<TResponse>(isTaskExistResult.Errors);
+            return CreateFailureResult(isTaskExistResult.Errors);
         }
 
         if (shouldExist && !isTaskExistResult.Response)
         {
             logger.LogWarning("Task does not exist");
-            return CreateFailureResult<TResponse>(new NotFoundError("Task", taskId.ToString()));
+            return CreateFailureResult(new NotFoundError("Task", taskId.ToString()));
 
         }
 
         if (!shouldExist && isTaskExistResult.Response)
         {
             logger.LogWarning("Task with the same ID already exists");
-            return CreateFailureResult<TResponse>(new ConflictError("Task already exists", "Task", taskId.ToString()));
+            return CreateFailureResult(new ConflictError("Task already exists", "Task", taskId.ToString()));
         }
 
         return await next(); 
@@ -59,17 +60,35 @@ public class TaskExistenceBehavior<TRequest, TResponse>(
         };
     }
     
-    private TResponse CreateFailureResult<T>(Error error)
+    private TResponse CreateFailureResult(Error error)
     {
-        var resultType = typeof(Result<>).MakeGenericType(typeof(TResponse));
-        var failureResult = Activator.CreateInstance(resultType, error);
-        return (TResponse)failureResult!;
+        // Directly create a failure result of the expected TResponse type
+        var resultType = typeof(TResponse);
+        var bindingFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic;
+        var constructor = resultType.GetConstructor(bindingFlags,new[] { typeof(Error) });
+        
+        if (constructor != null)
+        {
+            return (TResponse)constructor.Invoke(new object[] { error });
+        }
+
+        throw new InvalidOperationException($"Unable to create failure result of type {resultType}");
     }
-    private TResponse CreateFailureResult<T>(List<Error> errors)
+
+    private TResponse CreateFailureResult(List<Error> errors)
     {
-        var resultType = typeof(Result<>).MakeGenericType(typeof(TResponse));
-        var failureResult = Activator.CreateInstance(resultType, errors);
-        return (TResponse)failureResult!;
+        // Directly create a failure result of the expected TResponse type using a List of Errors
+        var resultType = typeof(TResponse);
+        var bindingFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic;
+
+        var constructor = resultType.GetConstructor(bindingFlags, new[] { typeof(List<Error>) });
+        
+        if (constructor != null)
+        {
+            return (TResponse)constructor.Invoke(new object[] { errors });
+        }
+
+        throw new InvalidOperationException($"Unable to create failure result of type {resultType}");
     }
 
 }

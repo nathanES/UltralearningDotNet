@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using TaskManagement.Common.Commands;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.Middleware.PipelineBehaviors;
 
@@ -15,6 +16,7 @@ public static class CommonServiceCollectionExtensions
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UserExistenceBehavior<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TaskExistenceBehavior<,>));
+        services.AddRequestHandlersFromAssembly(typeof(ICommandMarker).Assembly);
 
         return services;
     }

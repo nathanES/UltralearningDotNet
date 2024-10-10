@@ -15,6 +15,7 @@ builder.Configuration.AddUserSecrets<Program>(
     optional: false,
     reloadOnChange: true);
 // it load files in : ~/.microsoft/usersecrets/<user_secrets_id>/secrets.json. It's only for development
+//To create the file, left-click on the project > Tool> .Net UserSecret
 var config = builder.Configuration;
 
 builder.Logging.ClearProviders();
