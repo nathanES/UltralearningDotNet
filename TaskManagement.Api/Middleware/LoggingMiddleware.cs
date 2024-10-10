@@ -1,4 +1,5 @@
 using System.Text;
+using Newtonsoft.Json;
 
 namespace TaskManagement.Api.Middleware;
 
@@ -6,6 +7,8 @@ public class LoggingMiddleware(RequestDelegate next, ILogger<LoggingMiddleware> 
 {
     public async Task InvokeAsync(HttpContext context)
     {
+        logger.LogInformation($"Request Headers: {JsonConvert.SerializeObject(context.Request.Headers)}");
+
         // Log query parameters
         if (context.Request.Query.Any())
         {
@@ -64,6 +67,8 @@ public class LoggingMiddleware(RequestDelegate next, ILogger<LoggingMiddleware> 
 
             // Copy the response body back to the original stream
             await responseBody.CopyToAsync(originalBodyStream);
+            logger.LogInformation($"Response Headers: {JsonConvert.SerializeObject(context.Response.Headers)}");
+
         }
     }
 }

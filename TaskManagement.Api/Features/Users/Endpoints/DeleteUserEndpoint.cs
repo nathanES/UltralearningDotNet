@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TaskManagement.Api.Auth;
+using TaskManagement.Api.Cache;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.ResultPattern;
 using TaskManagement.Common.ResultPattern.Errors;
@@ -16,6 +18,7 @@ public static class DeleteUserEndpoint
         app.MapDelete(ApiEndpoints.Users.Delete, async (Guid id,
                 [FromServices] IMediator mediator,
                 [FromServices]ILogger<ILogger> logger,
+                IOutputCacheStore outputCacheStore,
                 CancellationToken token) =>
             {
                 var command = new DeleteUserCommand(id);
@@ -30,7 +33,8 @@ public static class DeleteUserEndpoint
                     logger.LogError(string.Join(", ", deleteUserResult.Errors.Select(e => e.Message)));
                     return Results.Problem( "An error occurred while deleting the user");
                 }
-
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetUserCache.tag, token);
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetAllUsersCache.tag, token);
                 return Results.Ok();
             })
             .WithName(Name)

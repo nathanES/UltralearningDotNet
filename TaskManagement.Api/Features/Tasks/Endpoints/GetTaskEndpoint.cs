@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Api.Auth;
+using TaskManagement.Api.Cache;
 using TaskManagement.Api.Features.Tasks.Mapping;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.ResultPattern;
@@ -38,6 +39,7 @@ public static class GetTaskEndpoint
                 var response = getTaskResult.Response.MapToResponse();
                 return TypedResults.Ok(response);
             })
+            .CacheOutput(PolicyConstants.GetTaskCache.name)
             .WithName(Name)
             .Produces<TaskResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)

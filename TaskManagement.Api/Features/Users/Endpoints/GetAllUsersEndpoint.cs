@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Api.Auth;
+using TaskManagement.Api.Cache;
 using TaskManagement.Api.Features.Users.Mapping;
 using TaskManagement.Api.Versioning;
 using TaskManagement.Common.Middleware;
@@ -33,12 +34,12 @@ public static class GetAllUsersEndpoint
                 var response = getUsersResult.Response.MapToResponse();
                 return TypedResults.Ok(response);
             })
+            .CacheOutput(PolicyConstants.GetAllUsersCache.name)
             .WithName($"{Name}V1")
             .Produces<UsersResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .WithApiVersionSet(ApiVersioning.VersionSet)
-            .HasApiVersion(1.0)
-            .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);
+            .HasApiVersion(1.0);
         return app;
     }
 }

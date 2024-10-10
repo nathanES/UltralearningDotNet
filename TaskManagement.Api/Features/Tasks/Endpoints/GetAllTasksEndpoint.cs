@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Api.Auth;
+using TaskManagement.Api.Cache;
 using TaskManagement.Api.Features.Tasks.Mapping;
 using TaskManagement.Api.Versioning;
 using TaskManagement.Common.Middleware;
@@ -19,25 +20,28 @@ public static class GetAllTasksEndpoint
     {
         app.MapGet(ApiEndpoints.Tasks.GetAll, async ([AsParameters] GetAllTasksRequest request,
                 [FromServices] IMediator mediator,
-                [FromServices]ILogger<ILogger> logger,
+                [FromServices] ILogger<ILogger> logger,
                 CancellationToken token) =>
             {
+                logger.LogDebug("Requesting GetAllTasks with caching policy applied.");
                 var command = request.MapToCommand();
-                var getTasksResult = await mediator.SendAsync<GetAllTasksCommand ,Result<IEnumerable<Task>>>(command, token);
+                var getTasksResult =
+                    await mediator.SendAsync<GetAllTasksCommand, Result<IEnumerable<Task>>>(command, token);
                 if (getTasksResult.IsFailure)
                 {
                     logger.LogError(string.Join(", ", getTasksResult.Errors.Select(e => e.Message)));
-                    return Results.Problem( "An error occurred while retrieving all tasks");
+                    return Results.Problem("An error occurred while retrieving all tasks");
                 }
+
                 var response = getTasksResult.Response.MapToResponse();
                 return TypedResults.Ok(response);
             })
+            .CacheOutput(PolicyConstants.GetAllTasksCache.name)
             .WithName($"{Name}V1")
             .Produces<TasksResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .WithApiVersionSet(ApiVersioning.VersionSet)
-            .HasApiVersion(1.0)
-            .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);;
+            .HasApiVersion(1.0);
         return app;
     }
 }

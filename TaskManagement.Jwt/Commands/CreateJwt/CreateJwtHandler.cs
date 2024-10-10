@@ -12,16 +12,11 @@ using TaskManagement.Jwt.Configurations;
 
 namespace TaskManagement.Jwt.Commands.CreateJwt;
 
-internal class CreateJwtHandler : IRequestHandler<CreateJwtCommand, Result<string>>
+internal class CreateJwtHandler(IOptions<JwtSettings> jwtSettingsOptions, ILogger<CreateJwtHandler> logger)
+    : IRequestHandler<CreateJwtCommand, Result<string>>
 {
-    private readonly ILogger<CreateJwtHandler> _logger;
-    private readonly JwtSettings _jwtSettings;
-    
-    public CreateJwtHandler(IOptions<JwtSettings> jwtSettingsOptions, ILogger<CreateJwtHandler> logger)
-    {
-        _logger = logger;
-        _jwtSettings = jwtSettingsOptions.Value;  // Get the bound JwtSettings values
-    }
+    private readonly JwtSettings _jwtSettings = jwtSettingsOptions.Value; // Get the bound JwtSettings values
+
     public async Task<Result<string>> HandleAsync(CreateJwtCommand request,
         CancellationToken cancellationToken = default)
     {
@@ -82,7 +77,7 @@ internal class CreateJwtHandler : IRequestHandler<CreateJwtCommand, Result<strin
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to generate JWT");
+            logger.LogError(ex, "Failed to generate JWT");
             return Result<string>.Failure(new GenericError("JWT Generation Error", details:ex.Message));
         }
     }

@@ -6,7 +6,8 @@ using TaskManagement.Common.ResultPattern;
 
 namespace TaskManagement.Users.Commands.DeleteUser;
 
-public class DeleteUserCommand(Guid id) : IRequest<Result<None>>, IUserCommand
+public class DeleteUserCommand(Guid id) 
+    : IRequest<Result<None>>, IShouldUserExistUserCommand
 {
     public Guid Id { get; } = id;
 }

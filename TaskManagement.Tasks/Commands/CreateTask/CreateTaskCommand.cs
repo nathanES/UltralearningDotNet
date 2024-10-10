@@ -7,7 +7,7 @@ using TaskManagement.Common.Models;
 namespace TaskManagement.Tasks.Commands.CreateTask;
 
 public class CreateTaskCommand(Guid id, string title, string description, DateTime? deadline, Priority? priority, Status? status, Guid? userId )
-    : IRequest<Result<Task>>, ITaskCommand, IShouldCheckUserExistenceCommand, ICreateCommand
+    : IRequest<Result<Task>>, IShouldUserExistCommand, IShouldTaskNotExistTaskCommand
 {
     public Guid Id { get; } = id;
     public string Title { get; } = title;

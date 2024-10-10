@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TaskManagement.Api.Auth;
+using TaskManagement.Api.Cache;
 using TaskManagement.Api.Features.Users.Mapping;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.Models;
@@ -18,13 +20,15 @@ public static class UpdateUserEndpoint
     public static IEndpointRouteBuilder MapUpdateUser(this IEndpointRouteBuilder app)
     {
         app.MapPut(ApiEndpoints.Users.Update, async (Guid id,
-                [FromBody]UpdateUserRequest request, 
-                [FromServices] IMediator mediator, [FromServices]ILogger<ILogger> logger,
+                [FromBody] UpdateUserRequest request,
+                [FromServices] IMediator mediator,
+                [FromServices] ILogger<ILogger> logger,
+                IOutputCacheStore outputCacheStore,
                 CancellationToken token) =>
             {
                 var command = request.MapToCommand(id);
                 var updateUserResult = await mediator.SendAsync<UpdateUserCommand, Result<User>>(command, token);
-                
+
                 if (updateUserResult.IsFailure && updateUserResult.Errors.OfType<NotFoundError>().Any())
                 {
                     return Results.NotFound(new { Message = "User not found" });
@@ -33,8 +37,12 @@ public static class UpdateUserEndpoint
                 if (updateUserResult.IsFailure)
                 {
                     logger.LogError(string.Join(", ", updateUserResult.Errors.Select(e => e.Message)));
-                    return Results.Problem( "An error occurred while deleting the user");
+                    return Results.Problem("An error occurred while deleting the user");
                 }
+
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetUserCache.tag, token);
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetAllUsersCache.tag, token);
+
                 var response = updateUserResult.Response.MapToResponse();
                 return TypedResults.Ok(response);
             })

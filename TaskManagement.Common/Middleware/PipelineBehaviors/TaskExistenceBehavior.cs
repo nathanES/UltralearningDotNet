@@ -15,27 +15,16 @@ public class TaskExistenceBehavior<TRequest, TResponse>(
     public async Task<TResponse> HandleAsync(TRequest request, RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (request is not ITaskCommand && request is not IShouldCheckTaskExistenceCommand)
-        {
-            return await next();
-        }
-
-        var isCreateCommand = request is ICreateCommand;
-        var isUpdateCommand = request is IUpdateCommand;
-        
-        var taskId = request is ITaskCommand taskCommand
-            ? taskCommand.Id
-            : ((IShouldCheckTaskExistenceCommand)request).TaskId;
-        
+        var (taskId, shouldExist) = GetTaskExistenceDetails(request);
         if (!taskId.HasValue)
         {
             logger.LogInformation("TaskId don't have value");
-            return await next();
-        } 
+            return await next(); 
+        }
         
         var isTaskExistResult =
             await mediator.SendAsync<ExistTaskCommand, Result<bool>>(new ExistTaskCommand(taskId.Value),
-                cancellationToken);
+                cancellationToken); 
         
         if (isTaskExistResult.IsFailure)
         {
@@ -43,21 +32,33 @@ public class TaskExistenceBehavior<TRequest, TResponse>(
             return CreateFailureResult<TResponse>(isTaskExistResult.Errors);
         }
 
-        if (!isTaskExistResult.Response && isUpdateCommand)
+        if (shouldExist && !isTaskExistResult.Response)
         {
             logger.LogWarning("Task does not exist");
             return CreateFailureResult<TResponse>(new NotFoundError("Task", taskId.ToString()));
 
         }
 
-        if (isTaskExistResult.Response && isCreateCommand)
+        if (!shouldExist && isTaskExistResult.Response)
         {
             logger.LogWarning("Task with the same ID already exists");
             return CreateFailureResult<TResponse>(new ConflictError("Task already exists", "Task", taskId.ToString()));
         }
 
-        return await next();
+        return await next(); 
     }
+    private (Guid? taskId, bool shouldExist) GetTaskExistenceDetails(TRequest request)
+    {
+        return request switch
+        {
+            IShouldTaskExistCommand existCommand => (existCommand.TaskId, true),
+            IShouldTaskExistTaskCommand existTaskCommand => (existTaskCommand.Id, true),
+            IShouldTaskNotExistCommand notExistCommand => (notExistCommand.TaskId, false),
+            IShouldTaskNotExistTaskCommand notExistTaskCommand => (notExistTaskCommand.Id, false),
+            _ => (null, false)
+        };
+    }
+    
     private TResponse CreateFailureResult<T>(Error error)
     {
         var resultType = typeof(Result<>).MakeGenericType(typeof(TResponse));

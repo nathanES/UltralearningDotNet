@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TaskManagement.Api.Auth;
+using TaskManagement.Api.Cache;
 using TaskManagement.Api.Features.Tasks.Mapping;
 using TaskManagement.Api.Versioning;
 using TaskManagement.Common.Middleware;
@@ -19,6 +21,7 @@ public static class CreateTaskEndpoint
         app.MapPost(ApiEndpoints.Tasks.Create, async ([FromBody] CreateTaskRequest request,
                 [FromServices] IMediator mediator,
                 [FromServices] ILogger<ILogger> logger,
+                [FromServices] IOutputCacheStore outputCacheStore,
                 CancellationToken token) =>
             {
                 var command = request.MapToCommand();
@@ -28,7 +31,9 @@ public static class CreateTaskEndpoint
                     logger.LogError(string.Join(", ", createTaskResult.Errors.Select(e => e.Message)));
                     return Results.Problem("An error occurred while creating the task");
                 }
-
+                
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetAllTasksCache.tag, token);
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetTaskCache.tag, token);
                 var response = createTaskResult.Response.MapToResponse();
                 return TypedResults.CreatedAtRoute(response, $"{CreateTaskEndpoint.Name}V1", new { id = response.Id });
             })
@@ -36,7 +41,8 @@ public static class CreateTaskEndpoint
             .Produces<TaskResponse>(StatusCodes.Status201Created)
             .WithApiVersionSet(ApiVersioning.VersionSet)
             .HasApiVersion(1.0)
-            .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);
+            // .RequireAuthorization(AuthConstants.TrustedMemberPolicyName)
+            ;
 
 
         return app;

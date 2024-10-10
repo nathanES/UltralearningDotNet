@@ -6,7 +6,8 @@ using TaskManagement.Tasks.Interfaces;
 
 namespace TaskManagement.Tasks.Commands.DeleteTask;
 
-public class DeleteTaskCommand(Guid id) : IRequest<Result<None>>, ITaskCommand
+public class DeleteTaskCommand(Guid id) 
+    : IRequest<Result<None>>, IShouldTaskExistTaskCommand
 {
     public Guid Id { get; } = id;
 }

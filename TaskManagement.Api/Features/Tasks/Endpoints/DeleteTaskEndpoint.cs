@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TaskManagement.Api.Auth;
+using TaskManagement.Api.Cache;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.ResultPattern;
 using TaskManagement.Common.ResultPattern.Errors;
@@ -16,6 +18,7 @@ public static class DeleteTaskEndpoint
         app.MapDelete(ApiEndpoints.Tasks.Delete, async (Guid id,
                 [FromServices]IMediator mediator,
                 [FromServices]ILogger<ILogger> logger,
+                IOutputCacheStore outputCacheStore,
                 CancellationToken token) =>
             {
                 var command = new DeleteTaskCommand(id);
@@ -30,7 +33,9 @@ public static class DeleteTaskEndpoint
                     logger.LogError(string.Join(", ", deleteTaskResult.Errors.Select(e => e.Message)));
                     return Results.Problem( "An error occurred while deleting the task");
                 }
-                
+
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetAllTasksCache.tag, token);
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetTaskCache.tag, token);
                 return Results.Ok();
             })
             .WithName(Name)

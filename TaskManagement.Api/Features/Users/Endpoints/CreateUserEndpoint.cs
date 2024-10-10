@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TaskManagement.Api.Auth;
+using TaskManagement.Api.Cache;
 using TaskManagement.Api.Features.Users.Mapping;
 using TaskManagement.Api.Versioning;
 using TaskManagement.Common.Middleware;
@@ -20,6 +22,7 @@ public static class CreateUserEndpoint
         app.MapPost(ApiEndpoints.Users.Create, async ([FromBody] CreateUserRequest request,
                 [FromServices] IMediator mediator, 
                 [FromServices]ILogger<ILogger> logger,
+                IOutputCacheStore outputCacheStore,
                 CancellationToken token) =>
             {
                 var command = request.MapToCommand();
@@ -30,6 +33,8 @@ public static class CreateUserEndpoint
                     return Results.Problem( "An error occurred while creating the user");
                 }
 
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetUserCache.tag, token);
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetAllUsersCache.tag, token);
                 var response = createUserResult.Response.MapToResponse();
                 return TypedResults.CreatedAtRoute(response, $"{CreateUserEndpoint.Name}V1", new { id = response.Id });
             })

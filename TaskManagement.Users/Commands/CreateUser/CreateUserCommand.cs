@@ -7,7 +7,8 @@ using TaskManagement.Common.ResultPattern;
 
 namespace TaskManagement.Users.Commands.CreateUser;
 
-public class CreateUserCommand(Guid id, string username, string email) : IRequest<Result<User>>, IUserCommand, ICreateCommand
+public class CreateUserCommand(Guid id, string username, string email) 
+    : IRequest<Result<User>>, IShouldUserNotExistUserCommand
 {
     public Guid Id { get; } = id;
     public string Username { get; } = username;

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Api.Auth;
+using TaskManagement.Api.Cache;
 using TaskManagement.Api.Features.Users.Mapping;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.Models;
@@ -18,7 +19,7 @@ public static class GetUserEndpoint
     {
         app.MapGet(ApiEndpoints.Users.Get, async (Guid id,
                 [FromServices] IMediator mediator,
-                [FromServices]ILogger<ILogger> logger,
+                [FromServices] ILogger<ILogger> logger,
                 CancellationToken token) =>
             {
                 var command = new GetUserCommand(id);
@@ -31,16 +32,16 @@ public static class GetUserEndpoint
                 if (getUserResult.IsFailure)
                 {
                     logger.LogError(string.Join(", ", getUserResult.Errors.Select(e => e.Message)));
-                    return Results.Problem( "An error occurred while retrieving the user");
+                    return Results.Problem("An error occurred while retrieving the user");
                 }
 
                 var response = getUserResult.Response.MapToResponse();
                 return TypedResults.Ok(response);
             })
+            .CacheOutput(PolicyConstants.GetUserCache.name)
             .WithName(Name)
             .Produces<UserResponse>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);
+            .Produces(StatusCodes.Status404NotFound);
         return app;
     }
 }

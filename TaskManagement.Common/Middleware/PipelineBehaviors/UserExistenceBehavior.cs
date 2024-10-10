@@ -15,50 +15,48 @@ public class UserExistenceBehavior<TRequest, TResponse>(
     public async Task<TResponse> HandleAsync(TRequest request, RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (request is not IUserCommand && request is not IShouldCheckUserExistenceCommand)
-        {
-            return await next();
-        }
-
-        // If the request has a UserId property, validate that the user exists.
-        var userId = request is IUserCommand userCommand
-            ? userCommand.Id
-            : ((IShouldCheckUserExistenceCommand)request).UserId;
-        
+        var (userId, shouldExist) = GetUserExistenceDetails(request);
         if (!userId.HasValue)
         {
             logger.LogInformation("UserId don't have value");
-            return await next();
+            return await next(); 
         }
-
-        var isUserExistResult =
-            await mediator.SendAsync<ExistUserCommand, Result<bool>>(new ExistUserCommand(userId.Value),
-                cancellationToken);
-
+        
+        var isUserExistResult = await mediator.SendAsync<ExistUserCommand, Result<bool>>(new ExistUserCommand(userId.Value), cancellationToken);
+            
         if (isUserExistResult.IsFailure)
         {
-            logger.LogWarning("A technical error occurred while checking for user existence");
+            logger.LogWarning("Error occurred while checking user existence: {Errors}", isUserExistResult.Errors);
             return CreateFailureResult<TResponse>(isUserExistResult.Errors);
         }
 
-        var isCreateCommand = request is ICreateCommand;
-        var isUpdateCommand = request is IUpdateCommand;
-        
-        if (!isUserExistResult.Response && isUpdateCommand)
+        // Handle user existence logic
+        if (shouldExist && !isUserExistResult.Response)
         {
-            logger.LogWarning("User doesn't exist");
+            logger.LogWarning("User with ID {UserId} does not exist", userId);
             return CreateFailureResult<TResponse>(new ConflictError("User doesn't exist", "User", userId.ToString()));
         }
-        
-        if (isUserExistResult.Response && isCreateCommand)
+
+        if (!shouldExist && isUserExistResult.Response)
         {
-            logger.LogWarning("User with the same ID already exists");
-            return CreateFailureResult<TResponse>(new ConflictError("User already exist", "User", userId.ToString()));
+            logger.LogWarning("User with ID {UserId} already exists", userId);
+            return CreateFailureResult<TResponse>(new ConflictError("User already exists", "User", userId.ToString()));
         }
-        
-        // Proceed to the next behavior or handler
         return await next();
     }
+    private (Guid? userId, bool shouldExist) GetUserExistenceDetails(TRequest request)
+    {
+        return request switch
+        {
+            IShouldUserExistCommand existCommand => (existCommand.UserId, true),
+            IShouldUserExistUserCommand existUserCommand => (existUserCommand.Id, true),
+            IShouldUserNotExistCommand notExistCommand => (notExistCommand.UserId, false),
+            IShouldUserNotExistUserCommand notExistUserCommand => (notExistUserCommand.Id, false),
+            _ => (null, false)
+        };
+    }
+    
+    
     private TResponse CreateFailureResult<T>(Error error)
     {
         var resultType = typeof(Result<>).MakeGenericType(typeof(TResponse));

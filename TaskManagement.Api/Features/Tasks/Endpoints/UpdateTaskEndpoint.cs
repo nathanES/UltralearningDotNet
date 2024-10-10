@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TaskManagement.Api.Auth;
+using TaskManagement.Api.Cache;
 using TaskManagement.Api.Features.Tasks.Mapping;
 using TaskManagement.Common.Middleware;
 using TaskManagement.Common.ResultPattern;
@@ -21,6 +23,7 @@ public static class UpdateTaskEndpoint
                 [FromBody]UpdateTaskRequest request, 
                 [FromServices] IMediator mediator,
                 [FromServices]ILogger<ILogger> logger,
+                IOutputCacheStore outputCacheStore,
                 CancellationToken token) =>
             {
                 var command = request.MapToCommand(id);
@@ -35,7 +38,9 @@ public static class UpdateTaskEndpoint
                     logger.LogError(string.Join(", ", updateTaskResult.Errors.Select(e => e.Message)));
                     return Results.Problem( "An error occurred while deleting the task");
                 }
-                
+
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetAllTasksCache.tag, token);
+                await outputCacheStore.EvictByTagAsync(PolicyConstants.GetTaskCache.tag, token);
                 var response = updateTaskResult.Response.MapToResponse();
                 return TypedResults.Ok(response);
             })
