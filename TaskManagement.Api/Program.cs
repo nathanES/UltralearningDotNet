@@ -71,11 +71,12 @@ app.AddApiEndpoints();
 
 app.AddHealthEndpoints();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var initializers = services.GetServices<IDbInitializer>();
-    await Task.WhenAll(initializers.Select(x => x.InitializeAsync()));
-}
+// It's commented because we don't want to initialize the database anymore on AWS (if the database is local we would use that)
+// using (var scope = app.Services.CreateScope())
+// {
+//     var services = scope.ServiceProvider;
+//     var initializers = services.GetServices<IDbInitializer>();
+//     await Task.WhenAll(initializers.Select(x => x.InitializeAsync()));
+// }
 
 app.Run();

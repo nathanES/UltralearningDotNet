@@ -8,7 +8,7 @@ public class DbInitializer(TasksContext tasksContext) : IDbInitializer
     public async System.Threading.Tasks.Task InitializeAsync(CancellationToken token = default)
     {
         //Create the database if it is not
-        await tasksContext.Database.MigrateAsync(token);
+        //await tasksContext.Database.MigrateAsync(token);
         //Add Seed data if needed
     }
 
