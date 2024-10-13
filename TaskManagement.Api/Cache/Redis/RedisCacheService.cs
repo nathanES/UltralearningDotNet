@@ -101,12 +101,16 @@ internal class RedisCacheService(IDistributedCache cache,
 
         try
         {
-            var server = redisConnection.GetServer(redisConnection.GetEndPoints().First());
-            var keys = server.Keys(pattern: pattern);
-
-            foreach (var key in keys)
+            var endPoints = redisConnection.GetEndPoints();
+            foreach (var endpoint in endPoints)
             {
-                await cache.RemoveAsync(key!, token);
+                var server = redisConnection.GetServer(endpoint);
+                var keys = server.Keys(pattern: pattern);
+
+                foreach (var key in keys)
+                {
+                    await cache.RemoveAsync(key!, token);
+                }
             }
             return Result<None>.Success(None.Value);
         }

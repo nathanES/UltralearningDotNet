@@ -7,6 +7,7 @@ public static class RedisCacheExtensions
     public static IServiceCollection AddRedisCacheServices(this IServiceCollection services,
         ConfigurationManager config)
     {
+        //Redis need to run, see the redis kubernetes file
         services.Configure<RedisSettings>(config.GetSection("Redis"));
 
         services.AddStackExchangeRedisCache(options =>

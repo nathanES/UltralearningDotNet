@@ -22,6 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\TaskManagement.Api\TaskManagement.Api.csproj" />
       <ProjectReference Include="..\TaskManagement.Tasks\TaskManagement.Tasks.csproj" />
       <ProjectReference Include="..\TaskManagement.Users\TaskManagement.Users.csproj" />
     </ItemGroup>
