@@ -4,9 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace TaskManagement.Api.Auth;
 
-public static class AuthExtenstion
+public static class AuthExtensions
 {
-   public static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration config)
+   public static IServiceCollection AddAuthServices(this IServiceCollection services, IConfiguration config)
    {
       services.AddAuthentication(x =>
       {

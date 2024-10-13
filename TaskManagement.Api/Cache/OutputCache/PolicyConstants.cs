@@ -1,6 +1,6 @@
-namespace TaskManagement.Api.Cache;
+namespace TaskManagement.Api.Cache.OutputCache;
 
-public static class PolicyConstants
+internal static class PolicyConstants
 {
     public static readonly (string name, string tag) GetAllTasksCache = new ("GetAllTasksCache", "Tasks");
     public static readonly (string name, string tag) GetTaskCache = new ("GetTaskCache", "Task");

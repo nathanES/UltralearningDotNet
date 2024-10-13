@@ -7,12 +7,12 @@ using TaskManagement.Tasks.Infrastructure;
 
 namespace TaskManagement.Api.Features.Tasks;
 
-public static class TaskFeatureExtension
+public static class TasksExtensions
 {
-    public static IServiceCollection AddTaskFeatureServices(this IServiceCollection services, ConfigurationManager config)
+    public static IServiceCollection AddTasksServices(this IServiceCollection services, ConfigurationManager config)
     {
-        services.AddTaskInfrastructure(config["Database:Task:ConnectionString"]!);
-        services.AddTaskApplication();
+        services.AddTasksInfrastructure(config);
+        services.AddTasksApplication();
         return services;
     } 
 }

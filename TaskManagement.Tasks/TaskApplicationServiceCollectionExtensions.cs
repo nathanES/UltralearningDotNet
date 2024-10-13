@@ -17,7 +17,7 @@ namespace TaskManagement.Tasks;
 
 public static class TaskApplicationServiceCollectionExtensions
 {
-    public static IServiceCollection AddTaskApplication(this IServiceCollection services)
+    public static IServiceCollection AddTasksApplication(this IServiceCollection services)
     {
         services.AddScoped<ITaskService, TaskService>();
         services.AddRequestHandlersFromAssembly(typeof(ICommandMarker).Assembly);

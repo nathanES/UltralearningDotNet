@@ -15,7 +15,7 @@ namespace TaskManagement.Jwt.Commands.CreateJwt;
 internal class CreateJwtHandler(IOptions<JwtSettings> jwtSettingsOptions, ILogger<CreateJwtHandler> logger)
     : IRequestHandler<CreateJwtCommand, Result<string>>
 {
-    private readonly JwtSettings _jwtSettings = jwtSettingsOptions.Value; // Get the bound JwtSettings values
+    private readonly JwtSettings _jwtSettings = jwtSettingsOptions.Value; 
 
     public async Task<Result<string>> HandleAsync(CreateJwtCommand request,
         CancellationToken cancellationToken = default)

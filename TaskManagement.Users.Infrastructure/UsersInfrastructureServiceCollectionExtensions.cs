@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TaskManagement.Common.Interfaces;
 using TaskManagement.Users.Infrastructure.Database;
@@ -7,14 +8,14 @@ using TaskManagement.Users.Interfaces;
 
 namespace TaskManagement.Users.Infrastructure;
 
-public static class InfrastructureServiceCollectionExtensions
+public static class UsersInfrastructureServiceCollectionExtensions
 {
-    public static IServiceCollection AddUserInfrastructure(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddUsersInfrastructure(this IServiceCollection services, ConfigurationManager config)
     {
 
         services.AddDbContext<UsersContext>(options =>
         {
-            options.UseNpgsql(connectionString + "TrustServerCertificate=True;");
+            options.UseNpgsql(config.GetConnectionString("UsersDatabase") + "TrustServerCertificate=True;");
         }, ServiceLifetime.Scoped);
         
         services.AddScoped<IDbInitializer, DbInitializer>();

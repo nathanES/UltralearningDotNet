@@ -23,7 +23,7 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 builder.Logging.AddFilter("Microsoft.AspNetCore.OutputCaching", LogLevel.Debug);
 
-builder.Services.AddAuth(config);
+builder.Services.AddAuthServices(config);
 builder.Services.AddVersioning();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -33,7 +33,7 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwa
 builder.Services.AddSwaggerGen(x => x.OperationFilter<SwaggerDefaultValues>());
 
 builder.Services.TryAddCommonServices();
-builder.Services.AddFeatureServices(config);
+builder.Services.AddFeaturesServices(config);
 
 builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>("DatabaseHealth");
@@ -45,7 +45,7 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.AddCacheApplication();
+app.AddCacheApplications(config);
 
 app.CreateApiVersionSet();
 
@@ -67,7 +67,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.AddApiEndpoints();
+app.AddApiEndpoints(config);
 
 app.AddHealthEndpoints();
 
