@@ -1,0 +1,66 @@
+#Configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: 'redis-config-map'
+  labels:
+    app: redis-config-map
+data:
+  redis-config : |
+    maxmemory 256mb
+    maxmemory-policy allkeys-lru
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  labels:
+    app: taskmanagement-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: taskmanagement-redis   # Make sure this matches the labels in the template
+  template:
+    metadata:
+      labels:
+        app: taskmanagement-redis   # Label here
+    spec:
+      containers:
+        - name: redis
+          image: redis:latest
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - mountPath: /redis-master-data
+              name: data
+            - mountPath: /redis-master
+              name: config
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: redis-config-map
+            items:
+              - key: redis-config
+                path: redis.conf
+---
+
+#redis NodePort Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: taskmanagement-redis
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+      nodePort: 32000
+  selector:
+    app: taskmanagement-redis
+  

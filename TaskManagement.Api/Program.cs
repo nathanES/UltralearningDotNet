@@ -80,3 +80,5 @@ app.AddHealthEndpoints();
 // }
 
 app.Run();
+
+public partial class Program {} //For tests

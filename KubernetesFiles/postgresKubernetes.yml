@@ -1,0 +1,95 @@
+#Configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: 'task-postgres-secret'
+  labels:
+    app: task_postgres
+data:
+  POSTGRES_DB: 'Tasks'
+  POSTGRES_USER: 'task_ps_user'
+  POSTGRES_PASSWORD: 'task_SecurePassword'
+
+---
+
+# persistent-volume.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: task-postgres-pv
+spec:
+  capacity:
+    storage: 100Ki
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/postgres
+
+---
+
+# persistent-volume-claim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: task-postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Ki
+
+---
+
+# postgres-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: task-postgres
+spec:
+  selector:
+    matchLabels:
+      app: task-postgres
+  serviceName: "postgres"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: task-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+              name: postgres
+          envFrom:
+            - configMapRef:
+                name: 'task-postgres-secret'
+          volumeMounts:
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/postgres
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-persistent-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Ki
+
+---
+
+# postgres-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: task-postgres
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+      targetPort: 5432
+      nodePort: 32000
+  selector:
+    app: task-postgres
